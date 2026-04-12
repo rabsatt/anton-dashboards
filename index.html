@@ -3,38 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>rabsatt — Dashboards</title>
+<title>Dashboards — Sidney Rabsatt</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 48px 32px; max-width: 800px; margin: 0 auto; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 48px 32px; max-width: 860px; margin: 0 auto; }
   h1 { font-size: 24px; font-weight: 600; color: #e6edf3; margin-bottom: 8px; }
-  .sub { font-size: 13px; color: #8b949e; margin-bottom: 48px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; text-decoration: none; display: block; transition: border-color .15s; }
-  .card:hover { border-color: #58a6ff; }
-  .card h2 { font-size: 15px; font-weight: 600; color: #e6edf3; margin-bottom: 6px; }
-  .card p { font-size: 12px; color: #8b949e; line-height: 1.5; }
-  .card .meta { font-size: 11px; color: #484f58; margin-top: 12px; }
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; background: #1f6feb22; color: #58a6ff; border: 1px solid #1f6feb44; margin-right: 4px; }
+  .sub { font-size: 13px; color: #8b949e; margin-bottom: 48px; line-height: 1.6; }
+  .sub a { color: #58a6ff; text-decoration: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 22px; text-decoration: none; display: block; transition: border-color .15s, transform .15s; }
+  .card:hover { border-color: #58a6ff; transform: translateY(-2px); }
+  .card h2 { font-size: 15px; font-weight: 600; color: #e6edf3; margin-bottom: 8px; }
+  .card p { font-size: 12px; color: #8b949e; line-height: 1.6; }
+  .card .meta { font-size: 11px; color: #484f58; margin-top: 14px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; background: #1f6feb22; color: #58a6ff; border: 1px solid #1f6feb44; }
+  .tag.green { background: #3fb95022; color: #3fb950; border-color: #3fb95044; }
+  .tag.yellow { background: #d2992222; color: #d29922; border-color: #d2992244; }
   footer { margin-top: 64px; font-size: 11px; color: #484f58; }
+  footer a { color: #484f58; }
 </style>
 </head>
 <body>
+
 <h1>Dashboards</h1>
-<p class="sub">A collection of data dashboards by Sidney Rabsatt.</p>
+<p class="sub">Data visualizations by <a href="https://github.com/rabsatt">Sidney Rabsatt</a>. Built with <a href="https://github.com/mindsdb/mindsdb">Anton</a>.</p>
 
 <div class="grid">
-  <a class="card" href="dashboards/anton-usage.html">
-    <h2>⚡ Anton Usage</h2>
-    <p>External usage metrics for Anton — the open-source AI data analyst. Launch week Apr 1–11, 2026.</p>
+
+  <a class="card" href="dashboards/ai_skills_gap_clock.html">
+    <h2>⚡ The AI Skills Gap Clock</h2>
+    <p>Every occupation scored for AI exposure across 342 roles and 143M jobs. Which skills are being automated — and how fast?</p>
     <div class="meta">
-      <span class="tag">PostHog</span>
-      <span class="tag">Product Analytics</span>
-      &nbsp; Updated Apr 11, 2026
+      <span class="tag">BLS</span>
+      <span class="tag">AI</span>
+      <span class="tag green">Labor</span>
     </div>
   </a>
+
+  <a class="card" href="dashboards/real_cost_of_war.html">
+    <h2>💸 The Real Cost of a War</h2>
+    <p>Six US conflicts measured in dollars, debt, and lives per objective achieved. What the textbooks leave out.</p>
+    <div class="meta">
+      <span class="tag">FRED</span>
+      <span class="tag">DoD</span>
+      <span class="tag yellow">1941–2023</span>
+    </div>
+  </a>
+
+  <a class="card" href="dashboards/when_to_leave_a_city.html">
+    <h2>🏙️ When to Leave a City</h2>
+    <p>Rent trends, home price momentum, and real purchasing power by occupation and metro. A software engineer and a teacher face completely different signals in the same city.</p>
+    <div class="meta">
+      <span class="tag">Zillow</span>
+      <span class="tag">Census ACS</span>
+      <span class="tag">BLS</span>
+      <span class="tag green">2015–2026</span>
+    </div>
+  </a>
+
+  <a class="card" href="dashboards/who_controls_inflation.html">
+    <h2>📈 Who Actually Controls Inflation?</h2>
+    <p>The post-COVID inflation spike wasn't driven by government spending — it was used cars, shelter, and energy. Here's what the data actually shows.</p>
+    <div class="meta">
+      <span class="tag">FRED</span>
+      <span class="tag">BLS</span>
+      <span class="tag yellow">2000–2026</span>
+    </div>
+  </a>
+
+  <a class="card" href="dashboards/neighbors.html">
+    <h2>🗺️ How Old Are My Neighbors?</h2>
+    <p>Age and lifestyle by ZIP code across 31,433 US neighborhoods. Click any dot on the map to see the demographic profile of that area.</p>
+    <div class="meta">
+      <span class="tag">Census ACS 2022</span>
+      <span class="tag green">31,433 ZIPs</span>
+    </div>
+  </a>
+
 </div>
 
-<footer>Built with Anton &nbsp;·&nbsp; github.com/rabsatt/anton-dashboards</footer>
+<footer>
+  <a href="https://github.com/rabsatt/anton-dashboards">github.com/rabsatt/anton-dashboards</a>
+</footer>
+
 </body>
 </html>

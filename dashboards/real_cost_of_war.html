@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>The Real Cost of a War</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;padding:32px 28px;}
+.header{text-align:center;margin-bottom:44px;}
+.eyebrow{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:#6e7681;margin-bottom:14px;}
+.header h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#e6edf3;letter-spacing:-0.02em;margin-bottom:10px;}
+.header-sub{font-size:0.85rem;color:#8b949e;max-width:700px;margin:0 auto;line-height:1.75;}
+.header-sub strong{color:#e6edf3;}
+.hero-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1300px;margin:0 auto 32px;}
+@media(max-width:900px){.hero-row{grid-template-columns:repeat(2,1fr);}}
+.hcard{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px 22px;text-align:center;}
+.hc-eye{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:#6e7681;margin-bottom:8px;}
+.hc-val{font-size:2.0rem;font-weight:900;line-height:1;margin-bottom:5px;}
+.hc-sub{font-size:0.72rem;color:#8b949e;line-height:1.5;}
+.callout{background:rgba(248,81,73,0.06);border:1px solid rgba(248,81,73,0.2);border-radius:10px;padding:18px 24px;max-width:1300px;margin:0 auto 32px;font-size:0.83rem;color:#c9d1d9;line-height:1.75;}
+.callout strong{color:#f85149;}
+.sec-title{font-size:0.7rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#6e7681;max-width:1300px;margin:0 auto 10px;}
+.sec-sub{font-size:0.74rem;color:#484f58;max-width:1300px;margin:-6px auto 14px;line-height:1.5;}
+.chart-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:24px;max-width:1300px;margin:0 auto 28px;}
+.card-title{font-size:0.71rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#8b949e;margin-bottom:3px;}
+.card-sub{font-size:0.68rem;color:#484f58;margin-bottom:14px;line-height:1.5;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1300px;margin:0 auto 28px;}
+@media(max-width:860px){.two-col{grid-template-columns:1fr;}}
+.war-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1300px;margin:0 auto 32px;}
+@media(max-width:900px){.war-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.war-grid{grid-template-columns:1fr;}}
+.war-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px 20px;border-top-width:3px;}
+.wc-name{font-size:0.78rem;font-weight:700;letter-spacing:0.06em;margin-bottom:2px;}
+.wc-years{font-size:0.64rem;color:#6e7681;margin-bottom:12px;}
+.wc-stat{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #21262d;}
+.wc-stat:last-child{border-bottom:none;}
+.wc-label{font-size:0.64rem;color:#6e7681;}
+.wc-value{font-size:0.82rem;font-weight:700;}
+.wc-note{font-size:0.62rem;color:#484f58;margin-top:10px;line-height:1.4;font-style:italic;}
+.src{font-size:0.6rem;color:#30363d;margin-top:10px;}
+footer{text-align:center;margin-top:24px;font-size:0.65rem;color:#30363d;padding-bottom:28px;line-height:2;}
+footer a{color:#484f58;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="eyebrow">FRED · Watson Institute · Congressional Research Service · DoD · 1941–2023</div>
+  <h1>The Real Cost of a War</h1>
+  <p class="header-sub">Textbooks show troop counts and battle maps. They rarely show <strong>what wars cost in dollars, debt, and lives per objective achieved</strong>. These six conflicts tell a story about how the economics of war changed when America stopped drafting and started borrowing.</p>
+</div>
+<div class="hero-row">
+  <div class="hcard" style="border-color:rgba(248,81,73,0.3);background:rgba(248,81,73,0.04);">
+    <div class="hc-eye">💸 Total Cost — All 6 Wars</div>
+    <div class="hc-val" style="color:#f85149;">$10.6T</div>
+    <div class="hc-sub">2023 dollars · enough to fund NASA for <strong style="color:#f85149">440 years</strong></div>
+  </div>
+  <div class="hcard" style="border-color:rgba(56,139,253,0.3);background:rgba(56,139,253,0.04);">
+    <div class="hc-eye">🪦 US Military Deaths</div>
+    <div class="hc-val" style="color:#388bfd;">507,069</div>
+    <div class="hc-sub">83% from WWII alone · post-9/11 wars: <strong style="color:#388bfd">6,892</strong> deaths, $4.2T spent</div>
+  </div>
+  <div class="hcard" style="border-color:rgba(188,140,255,0.3);background:rgba(188,140,255,0.04);">
+    <div class="hc-eye">💀 Cost Per US Death — Afghanistan</div>
+    <div class="hc-val" style="color:#bc8cff;">$940M</div>
+    <div class="hc-sub">vs. <strong style="color:#bc8cff">$12M</strong> in WWII · modern wars cost more per death but fewer Americans die</div>
+  </div>
+  <div class="hcard" style="border-color:rgba(240,136,62,0.3);background:rgba(240,136,62,0.04);">
+    <div class="hc-eye">📈 Post-9/11 Debt Added</div>
+    <div class="hc-val" style="color:#f0883e;">~$8T</div>
+    <div class="hc-sub">Afg + Iraq funded entirely by borrowing · tax cuts passed <em>simultaneously</em></div>
+  </div>
+</div>
+<div class="callout">
+  <strong>The structural shift nobody talks about:</strong> WWII was financed through war bonds, income taxes as high as 94%, and rationing — Americans felt it. Post-9/11 wars were financed entirely through deficit spending, fought by a volunteer military representing &lt;1% of the population, with tax cuts passed <em>simultaneously</em>. The result: $4.2 trillion spent, 6,892 US deaths, and outcomes that inverted within months of withdrawal. When war has no visible cost to most citizens, the threshold to start one gets lower.
+</div>
+<div class="sec-title">⚡ The One Chart — Cost, Lives &amp; Duration</div>
+<div class="sec-sub">Bubble size = total cost in 2023 dollars · X axis = US military deaths (log scale) · Y axis = duration in years · Hover for full breakdown</div>
+<div class="chart-card">
+  <div id="mainScatter" style="width:100%;height:460px;"></div>
+  <div class="src">Sources: Congressional Research Service "Costs of Major U.S. Wars" 2023 · Watson Institute Costs of War Project · DoD casualty statistics</div>
+</div>
+<div class="sec-title">📈 US Defense Spending — War Periods Highlighted</div>
+<div class="sec-sub">Quarterly SAAR, billions of dollars · FRED series FDEFX · War periods shaded by conflict</div>
+<div class="chart-card">
+  <div id="defenseTimeline" style="width:100%;height:320px;"></div>
+  <div class="src">Source: FRED FDEFX — Federal Defense Expenditures, Seasonally Adjusted Annual Rate</div>
+</div>
+<div class="two-col">
+  <div class="chart-card" style="margin:0;">
+    <div class="card-title">Cost Per US Military Death (2023 $M)</div>
+    <div class="card-sub">The price of each American life has risen 80× from WWII to Afghanistan — driven by technology, contractor costs, and longer engagements with smaller forces</div>
+    <div id="costPerDeathChart" style="width:100%;height:300px;"></div>
+  </div>
+  <div class="chart-card" style="margin:0;">
+    <div class="card-title">Cost vs. Deaths — The Efficiency Inversion</div>
+    <div class="card-sub">More recent wars cost vastly more but kill fewer Americans. The question is whether that reflects better protection or worse strategic return on investment.</div>
+    <div id="costDeathBar" style="width:100%;height:300px;"></div>
+  </div>
+</div>
+<div class="sec-title" style="margin-top:4px;">📋 War by War Breakdown</div>
+<div class="sec-sub">All costs inflation-adjusted to 2023 dollars · Sources: CRS, Watson Institute, DoD</div>
+<div class="war-grid" id="warGrid"></div>
+<footer>
+  <a href="https://sgp.fas.org/crs/natsec/RS22926.pdf">CRS Costs of Major U.S. Wars</a> ·
+  <a href="https://watson.brown.edu/costsofwar/">Watson Institute Costs of War</a> ·
+  <a href="https://fred.stlouisfed.org/series/FDEFX">FRED FDEFX</a> ·
+  <a href="https://www.defense.gov/casualty.pdf">DoD Casualty Statistics</a> ·
+  Built with Anton
+</footer>
+
+<script>
+const D = {"wars": [{"name": "World War II", "short": "WWII", "years": "1941\u20131945", "start": 1941, "end": 1945, "duration_years": 4, "us_military_dead": 405000, "us_wounded": 671000, "civilian_dead": 0, "total_dead_millions": 70, "cost_2023_billions": 4700, "debt_added_billions": 1800, "peak_gdp_pct": 37, "source_cost": "Congressional Research Service 2023", "color": "#f85149", "note": "Peak defense spending: 37% of GDP. Mobilized 12M troops.", "avg_defense_bn": 293.75, "pre_defense_bn": null, "defense_surge_pct": null, "fred_debt_added": null, "cost_per_death_m": 11.6}, {"name": "Korean War", "short": "Korea", "years": "1950\u20131953", "start": 1950, "end": 1953, "duration_years": 3, "us_military_dead": 36574, "us_wounded": 103284, "civilian_dead": 0, "total_dead_millions": 3.0, "cost_2023_billions": 738, "debt_added_billions": 320, "peak_gdp_pct": 14.2, "source_cost": "Congressional Research Service 2023", "color": "#f0883e", "note": "The 'Forgotten War.' Ended in armistice, not peace treaty.", "avg_defense_bn": 46.2, "pre_defense_bn": 21.4, "defense_surge_pct": 115.7, "fred_debt_added": null, "cost_per_death_m": 20.2}, {"name": "Vietnam War", "short": "Vietnam", "years": "1965\u20131975", "start": 1965, "end": 1975, "duration_years": 10, "us_military_dead": 58220, "us_wounded": 303644, "civilian_dead": 0, "total_dead_millions": 3.5, "cost_2023_billions": 844, "debt_added_billions": 500, "peak_gdp_pct": 9.4, "source_cost": "Congressional Research Service 2023", "color": "#d29922", "note": "Longest major US war until Afghanistan. 58K deaths, no victory.", "avg_defense_bn": 98.3, "pre_defense_bn": 69.8, "defense_surge_pct": 40.8, "fred_debt_added": null, "cost_per_death_m": 14.5}, {"name": "Gulf War", "short": "Gulf War", "years": "1990\u20131991", "start": 1990, "end": 1991, "duration_years": 1, "us_military_dead": 383, "us_wounded": 467, "civilian_dead": 0, "total_dead_millions": 0.025, "cost_2023_billions": 116, "debt_added_billions": 80, "peak_gdp_pct": 0.4, "source_cost": "Congressional Research Service 2023", "color": "#3fb950", "note": "Allies paid ~$54B. Shortest major conflict. Clear mandate & exit.", "avg_defense_bn": 409.5, "pre_defense_bn": 381.9, "defense_surge_pct": 7.2, "fred_debt_added": 750.0, "cost_per_death_m": 302.9}, {"name": "Afghanistan", "short": "Afghanistan", "years": "2001\u20132021", "start": 2001, "end": 2021, "duration_years": 20, "us_military_dead": 2461, "us_wounded": 20744, "civilian_dead": 0, "total_dead_millions": 0.176, "cost_2023_billions": 2313, "debt_added_billions": 2000, "peak_gdp_pct": 1.2, "source_cost": "Watson Institute Costs of War Project 2023", "color": "#388bfd", "note": "Longest US war. Ended with Taliban retaking Kabul in 72 hours.", "avg_defense_bn": 717.2, "pre_defense_bn": 381.5, "defense_surge_pct": 88.0, "fred_debt_added": 23843.0, "cost_per_death_m": 939.9}, {"name": "Iraq War", "short": "Iraq", "years": "2003\u20132011", "start": 2003, "end": 2011, "duration_years": 8, "us_military_dead": 4431, "us_wounded": 31994, "civilian_dead": 0, "total_dead_millions": 0.208, "cost_2023_billions": 1922, "debt_added_billions": 1900, "peak_gdp_pct": 1.0, "source_cost": "Watson Institute Costs of War Project 2023", "color": "#bc8cff", "note": "WMDs never found. Destabilized region. Cost/outcome ratio stark.", "avg_defense_bn": 691.2, "pre_defense_bn": 421.6, "defense_surge_pct": 64.0, "fred_debt_added": 8762.0, "cost_per_death_m": 433.8}], "defense_ts": [[1947, 21.1], [1948, 20.9], [1949, 22.3], [1950, 22.6], [1951, 43.7], [1952, 57.4], [1953, 61.1], [1954, 54.4], [1955, 52.4], [1956, 55.0], [1957, 59.9], [1958, 62.2], [1959, 60.9], [1960, 60.9], [1961, 64.5], [1962, 69.7], [1963, 70.0], [1964, 69.7], [1965, 70.6], [1966, 82.5], [1967, 95.0], [1968, 101.4], [1969, 102.1], [1970, 100.7], [1971, 98.0], [1972, 100.7], [1973, 102.6], [1974, 109.9], [1975, 118.0], [1976, 125.0], [1977, 134.4], [1978, 145.2], [1979, 160.6], [1980, 183.4], [1981, 213.4], [1982, 245.4], [1983, 272.1], [1984, 298.8], [1985, 329.5], [1986, 352.4], [1987, 372.4], [1988, 382.1], [1989, 391.2], [1990, 405.0], [1991, 414.0], [1992, 406.5], [1993, 391.6], [1994, 382.1], [1995, 377.2], [1996, 377.3], [1997, 372.0], [1998, 368.8], [1999, 383.3], [2000, 392.6], [2001, 413.2], [2002, 458.9], [2003, 521.2], [2004, 569.9], [2005, 609.4], [2006, 640.8], [2007, 679.3], [2008, 750.3], [2009, 787.6], [2010, 828.0], [2011, 834.0], [2012, 814.2], [2013, 764.3], [2014, 744.1], [2015, 730.4], [2016, 729.4], [2017, 748.3], [2018, 795.1], [2019, 849.5], [2020, 884.9], [2021, 909.1], [2022, 929.6], [2023, 1004.0], [2024, 1082.7], [2025, 1143.4]], "debt_ts": [[1966, 329.3], [1967, 344.7], [1968, 358.0], [1969, 368.2], [1970, 389.2], [1971, 424.1], [1972, 448.5], [1973, 469.1], [1974, 492.7], [1975, 576.6], [1976, 653.5], [1977, 718.9], [1978, 789.2], [1979, 845.1], [1980, 930.2], [1981, 1028.7], [1982, 1197.1], [1983, 1410.7], [1984, 1663.0], [1985, 1945.9], [1986, 2214.8], [1987, 2431.7], [1988, 2684.4], [1989, 2953.0], [1990, 3364.8], [1991, 3801.7], [1992, 4177.0], [1993, 4535.7], [1994, 4800.1], [1995, 4988.7], [1996, 5323.2], [1997, 5502.4], [1998, 5614.2], [1999, 5776.1], [2000, 5662.2], [2001, 5943.4], [2002, 6405.7], [2003, 6998.0], [2004, 7596.1], [2005, 8170.4], [2006, 8680.2], [2007, 9229.2], [2008, 10699.8], [2009, 12311.3], [2010, 14025.2], [2011, 15222.9], [2012, 16432.7], [2013, 17156.1], [2014, 18141.4], [2015, 18922.2], [2016, 19976.8], [2017, 20492.7], [2018, 21974.1], [2019, 23201.4], [2020, 27747.8], [2021, 29617.2], [2022, 31419.7], [2023, 34001.5], [2024, 36218.6], [2025, 38514.0]], "gdp_ts": [[1929, 104.6], [1930, 92.2], [1931, 77.4], [1932, 59.5], [1933, 57.2], [1934, 66.8], [1935, 74.2], [1936, 84.8], [1937, 93.0], [1938, 87.4], [1939, 93.4], [1940, 102.9], [1941, 129.3], [1942, 166.0], [1943, 203.1], [1944, 224.4], [1945, 228.0], [1946, 227.5], [1947, 249.6], [1948, 274.5], [1949, 272.5], [1950, 299.8], [1951, 346.9], [1952, 367.3], [1953, 389.2], [1954, 390.5], [1955, 425.5], [1956, 449.4], [1957, 474.0], [1958, 481.2], [1959, 521.7], [1960, 542.4], [1961, 562.2], [1962, 603.9], [1963, 637.5], [1964, 684.5], [1965, 742.3], [1966, 813.4], [1967, 860.0], [1968, 940.7], [1969, 1017.6], [1970, 1073.3], [1971, 1164.8], [1972, 1279.1], [1973, 1425.4], [1974, 1545.2], [1975, 1684.9], [1976, 1873.4], [1977, 2081.8], [1978, 2351.6], [1979, 2627.3], [1980, 2857.3], [1981, 3207.0], [1982, 3343.8], [1983, 3634.0], [1984, 4037.6], [1985, 4339.0], [1986, 4579.6], [1987, 4855.2], [1988, 5236.4], [1989, 5641.6], [1990, 5963.1], [1991, 6158.1], [1992, 6520.3], [1993, 6858.6], [1994, 7287.2], [1995, 7639.7], [1996, 8073.1], [1997, 8577.6], [1998, 9062.8], [1999, 9631.2], [2000, 10251.0], [2001, 10581.9], [2002, 10929.1], [2003, 11456.5], [2004, 12217.2], [2005, 13039.2], [2006, 13815.6], [2007, 14474.2], [2008, 14769.9], [2009, 14478.1], [2010, 15049.0], [2011, 15599.7], [2012, 16254.0], [2013, 16880.7], [2014, 17608.1], [2015, 18295.0], [2016, 18804.9], [2017, 19612.1], [2018, 20656.5], [2019, 21540.0], [2020, 21375.3], [2021, 23725.6], [2022, 26054.6], [2023, 27811.5], [2024, 29298.0], [2025, 30767.1]]};
+
+const TT = { backgroundColor:'#1c2128', borderColor:'#30363d', textStyle:{color:'#e6edf3',fontSize:12} };
+
+// ── Scatter ──────────────────────────────────────────────────────────────────
+const scatter = echarts.init(document.getElementById('mainScatter'), 'dark');
+scatter.setOption({
+  backgroundColor:'transparent',
+  tooltip:{
+    ...TT,
+    formatter: p => {
+      const w = p.data.war;
+      const gd = w.total_dead_millions >= 1 ? w.total_dead_millions+'M' : (w.total_dead_millions*1000).toFixed(0)+'K';
+      const cost = w.cost_2023_billions >= 1000 ? '$'+(w.cost_2023_billions/1000).toFixed(1)+'T' : '$'+w.cost_2023_billions+'B';
+      return `<strong style="font-size:13px">${w.name}</strong> <span style="color:#6e7681">${w.years}</span><br/>
+        <span style="color:#484f58">──────────────────</span><br/>
+        💸 Total Cost: <strong style="color:${w.color}">${cost}</strong> (2023$)<br/>
+        🪦 US Military Deaths: <strong>${w.us_military_dead.toLocaleString()}</strong><br/>
+        🤕 US Wounded: <strong>${w.us_wounded.toLocaleString()}</strong><br/>
+        🌍 Total Deaths (all sides): <strong>${gd}</strong><br/>
+        ⏱ Duration: <strong>${w.duration_years} years</strong><br/>
+        💀 Cost per US death: <strong style="color:${w.color}">$${w.cost_per_death_m.toLocaleString()}M</strong><br/>
+        <em style="color:#484f58;font-size:11px">${w.note}</em>`;
+    }
+  },
+  grid:{top:40,right:60,bottom:70,left:80},
+  xAxis:{
+    type:'log', name:'US Military Deaths  (log scale)',
+    nameLocation:'middle', nameGap:46,
+    nameTextStyle:{color:'#6e7681',fontSize:12},
+    axisLabel:{color:'#6e7681',fontSize:10,formatter:v=>v.toLocaleString()},
+    splitLine:{lineStyle:{color:'#21262d'}},
+    axisLine:{lineStyle:{color:'#30363d'}}
+  },
+  yAxis:{
+    type:'value', name:'Duration (Years)',
+    nameLocation:'middle', nameGap:46,
+    nameTextStyle:{color:'#6e7681',fontSize:12},
+    axisLabel:{color:'#6e7681',fontSize:10,formatter:v=>v+'yr'},
+    splitLine:{lineStyle:{color:'#21262d'}},
+    axisLine:{show:false},
+    min:0, max:24
+  },
+  series:[{
+    type:'scatter',
+    data: D.wars.map(w => ({
+      value: [w.us_military_dead, w.duration_years],
+      symbolSize: Math.sqrt(w.cost_2023_billions) * 2.8,
+      war: w,
+      itemStyle:{ color: w.color, opacity:0.82, borderColor:'rgba(255,255,255,0.15)', borderWidth:1.5 },
+      label:{
+        show:true,
+        formatter: w.short,
+        position: w.short==='WWII' ? 'left' : w.short==='Korea' ? 'top' : 'right',
+        color:'#e6edf3', fontSize:11, fontWeight:600,
+        textBorderColor:'#0d1117', textBorderWidth:2
+      }
+    })),
+    emphasis:{ itemStyle:{opacity:1, borderWidth:2.5} }
+  }],
+  graphic:[{
+    type:'text',left:'center',bottom:8,
+    style:{text:'Bubble size = Total cost in 2023 dollars  ·  X axis is log scale',fill:'#484f58',fontSize:11}
+  }]
+});
+
+// ── Defense timeline ─────────────────────────────────────────────────────────
+const defChart = echarts.init(document.getElementById('defenseTimeline'), 'dark');
+defChart.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',...TT,formatter:p=>`<strong>${p[0].axisValue}</strong><br/>Defense: <strong>$${p[0].value}B</strong> SAAR`},
+  grid:{top:16,right:24,bottom:40,left:64},
+  xAxis:{
+    type:'category',
+    data: D.defense_ts.map(p=>p[0]),
+    axisLabel:{color:'#6e7681',fontSize:10,interval:9},
+    axisLine:{lineStyle:{color:'#21262d'}},
+    axisTick:{show:false}
+  },
+  yAxis:{
+    type:'value', name:'$B SAAR',
+    nameTextStyle:{color:'#484f58',fontSize:10},
+    axisLabel:{color:'#6e7681',fontSize:10,formatter:v=>'$'+v+'B'},
+    splitLine:{lineStyle:{color:'#21262d'}},
+    axisLine:{show:false}
+  },
+  series:[
+    {
+      type:'line', data:[], silent:true, animation:false,
+      markArea:{ silent:true, data: D.wars.map(w=>[
+        { xAxis:String(w.start), itemStyle:{color:w.color+'18'} },
+        { xAxis:String(w.end) }
+      ])}
+    },
+    {
+      name:'Defense Spending', type:'line',
+      data: D.defense_ts.map(p=>p[1]),
+      smooth:true, symbol:'none',
+      lineStyle:{color:'#e6edf3',width:2},
+      areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,
+        colorStops:[{offset:0,color:'rgba(230,237,243,0.12)'},{offset:1,color:'rgba(230,237,243,0)'}]}}
+    },
+    ...D.wars.map(w => {
+      const midYr = w.start + Math.floor(w.duration_years/2);
+      return {
+        type:'line', data:[], silent:true, animation:false,
+        markLine:{
+          silent:true, symbol:'none',
+          lineStyle:{color:w.color,type:'solid',width:1,opacity:0.6},
+          label:{formatter:w.short,color:w.color,fontSize:9,fontWeight:700,position:'insideStartTop'},
+          data:[{xAxis:String(midYr)}]
+        }
+      };
+    })
+  ]
+});
+
+// ── Cost per death (horizontal bar) ─────────────────────────────────────────
+const cpdChart = echarts.init(document.getElementById('costPerDeathChart'), 'dark');
+cpdChart.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',...TT,formatter:p=>`${p[0].name}<br/>Cost per US death: <strong>$${p[0].value.toLocaleString()}M</strong>`},
+  grid:{top:12,right:20,bottom:16,left:100},
+  xAxis:{type:'value',axisLabel:{color:'#6e7681',fontSize:10,formatter:v=>'$'+v+'M'},splitLine:{lineStyle:{color:'#21262d'}},axisLine:{show:false}},
+  yAxis:{type:'category',data:D.wars.map(w=>w.short),axisLabel:{color:'#c9d1d9',fontSize:11},axisLine:{show:false},axisTick:{show:false}},
+  series:[{
+    type:'bar', barMaxWidth:28,
+    data: D.wars.map(w=>({ value:w.cost_per_death_m, itemStyle:{color:w.color,borderRadius:[0,4,4,0]} })),
+    label:{show:true,position:'right',color:'#8b949e',fontSize:10,formatter:p=>'$'+p.value.toLocaleString()+'M'}
+  }]
+});
+
+// ── Cost + Deaths dual bar ───────────────────────────────────────────────────
+const cdBar = echarts.init(document.getElementById('costDeathBar'), 'dark');
+cdBar.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',...TT},
+  legend:{data:['Cost ($B 2023)','US Deaths'],textStyle:{color:'#8b949e',fontSize:10},top:0,right:0},
+  grid:{top:32,right:16,bottom:40,left:100},
+  xAxis:[
+    {type:'value',name:'Cost $B',nameTextStyle:{color:'#f85149',fontSize:9},
+      axisLabel:{color:'#6e7681',fontSize:9,formatter:v=>'$'+v+'B'},
+      splitLine:{lineStyle:{color:'#21262d'}},axisLine:{show:false}},
+    {type:'value',name:'Deaths',nameTextStyle:{color:'#388bfd',fontSize:9},
+      axisLabel:{color:'#6e7681',fontSize:9,formatter:v=>v.toLocaleString()},
+      splitLine:{show:false},axisLine:{show:false},position:'top'}
+  ],
+  yAxis:{type:'category',data:D.wars.map(w=>w.short),axisLabel:{color:'#c9d1d9',fontSize:11},axisLine:{show:false},axisTick:{show:false}},
+  series:[
+    {
+      name:'Cost ($B 2023)', type:'bar', xAxisIndex:0, barGap:'20%', barMaxWidth:14,
+      data:D.wars.map(w=>({ value:w.cost_2023_billions, itemStyle:{color:w.color,opacity:0.85,borderRadius:[0,3,3,0]} }))
+    },
+    {
+      name:'US Deaths', type:'bar', xAxisIndex:1, barMaxWidth:14,
+      data:D.wars.map(w=>({ value:w.us_military_dead, itemStyle:{color:'#388bfd',opacity:0.5,borderRadius:[0,3,3,0]} }))
+    }
+  ]
+});
+
+// ── War cards ────────────────────────────────────────────────────────────────
+document.getElementById('warGrid').innerHTML = D.wars.map(w => {
+  const cost = w.cost_2023_billions >= 1000 ? '$'+(w.cost_2023_billions/1000).toFixed(1)+'T' : '$'+w.cost_2023_billions+'B';
+  const gd = w.total_dead_millions >= 1 ? w.total_dead_millions+'M' : (w.total_dead_millions*1000).toFixed(0)+'K';
+  const dur = w.duration_years + ' year' + (w.duration_years > 1 ? 's' : '');
+  return `
+  <div class="war-card" style="border-top-color:${w.color}">
+    <div class="wc-name" style="color:${w.color}">${w.name}</div>
+    <div class="wc-years">${w.years} · ${dur}</div>
+    <div class="wc-stat"><span class="wc-label">Total Cost (2023$)</span><span class="wc-value" style="color:${w.color}">${cost}</span></div>
+    <div class="wc-stat"><span class="wc-label">US Military Deaths</span><span class="wc-value">${w.us_military_dead.toLocaleString()}</span></div>
+    <div class="wc-stat"><span class="wc-label">US Wounded</span><span class="wc-value">${w.us_wounded.toLocaleString()}</span></div>
+    <div class="wc-stat"><span class="wc-label">Global Deaths (all sides)</span><span class="wc-value">${gd}</span></div>
+    <div class="wc-stat"><span class="wc-label">Cost per US Death</span><span class="wc-value" style="color:${w.color}">$${w.cost_per_death_m.toLocaleString()}M</span></div>
+    <div class="wc-stat"><span class="wc-label">Peak Defense % GDP</span><span class="wc-value">${w.peak_gdp_pct}%</span></div>
+    <div class="wc-note">${w.note}</div>
+  </div>`;
+}).join('');
+
+window.addEventListener('resize',()=>{
+  scatter.resize(); defChart.resize(); cpdChart.resize(); cdBar.resize();
+});
+</script>
+</body>
+</html>

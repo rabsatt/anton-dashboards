@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>When to Leave a City — Based on What You Do</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;padding:32px 28px;}
+
+.header{text-align:center;margin-bottom:36px;}
+.eyebrow{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:#6e7681;margin-bottom:14px;}
+.header h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#e6edf3;letter-spacing:-0.02em;margin-bottom:10px;}
+.header-sub{font-size:0.85rem;color:#8b949e;max-width:680px;margin:0 auto;line-height:1.75;}
+.header-sub strong{color:#e6edf3;}
+
+/* Controls */
+.controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;max-width:1300px;margin:0 auto 28px;
+  background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px 22px;}
+.ctrl-label{font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#6e7681;margin-right:4px;}
+.ctrl-select{background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:6px;padding:7px 12px;
+  font-size:0.82rem;cursor:pointer;outline:none;transition:border-color .2s;}
+.ctrl-select:hover,.ctrl-select:focus{border-color:#388bfd;}
+.ctrl-hint{font-size:0.7rem;color:#484f58;margin-left:auto;}
+
+/* Signal pill */
+.signal{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;}
+.signal-leave{background:rgba(248,81,73,0.15);color:#f85149;border:1px solid rgba(248,81,73,0.3);}
+.signal-watch{background:rgba(240,136,62,0.15);color:#f0883e;border:1px solid rgba(240,136,62,0.3);}
+.signal-stay{background:rgba(63,185,80,0.15);color:#3fb950;border:1px solid rgba(63,185,80,0.3);}
+.signal-neutral{background:rgba(56,139,253,0.15);color:#388bfd;border:1px solid rgba(56,139,253,0.3);}
+
+/* Main grid: left panel + right charts */
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;max-width:1300px;margin:0 auto 28px;}
+@media(max-width:960px){.main-grid{grid-template-columns:1fr;}}
+
+/* City list */
+.city-list-wrap{background:#161b22;border:1px solid #21262d;border-radius:12px;overflow:hidden;}
+.city-list-header{padding:14px 18px;border-bottom:1px solid #21262d;font-size:0.7rem;font-weight:700;
+  letter-spacing:0.12em;text-transform:uppercase;color:#6e7681;display:flex;justify-content:space-between;}
+.city-list{max-height:560px;overflow-y:auto;}
+.city-list::-webkit-scrollbar{width:4px;}
+.city-list::-webkit-scrollbar-track{background:#161b22;}
+.city-list::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px;}
+.city-row{display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid #161b22;
+  cursor:pointer;transition:background .15s;}
+.city-row:hover{background:#1c2128;}
+.city-row.active{background:#1c2128;border-left:3px solid #388bfd;}
+.city-row.active .city-name{color:#388bfd;}
+.cr-rank{font-size:0.65rem;color:#30363d;width:18px;text-align:right;flex-shrink:0;}
+.city-name{font-size:0.82rem;font-weight:600;color:#c9d1d9;flex:1;}
+.cr-rent{font-size:0.72rem;color:#6e7681;}
+.cr-signal-wrap{flex-shrink:0;}
+
+/* Right panel */
+.right-panel{display:flex;flex-direction:column;gap:16px;}
+.panel-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:700px){.panel-top{grid-template-columns:1fr 1fr;}}
+.stat-card{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px 18px;}
+.sc-eye{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#6e7681;margin-bottom:6px;}
+.sc-val{font-size:1.6rem;font-weight:800;line-height:1;margin-bottom:4px;}
+.sc-sub{font-size:0.68rem;color:#8b949e;line-height:1.4;}
+
+.chart-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px;}
+.card-title{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8b949e;margin-bottom:3px;}
+.card-sub{font-size:0.67rem;color:#484f58;margin-bottom:12px;line-height:1.4;}
+
+/* Bottom: comparative chart full width */
+.full-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:24px;
+  max-width:1300px;margin:0 auto 28px;}
+.fc-title{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8b949e;margin-bottom:3px;}
+.fc-sub{font-size:0.67rem;color:#484f58;margin-bottom:14px;line-height:1.4;}
+
+.sec-title{font-size:0.7rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;
+  color:#6e7681;max-width:1300px;margin:0 auto 10px;}
+
+.src{font-size:0.6rem;color:#30363d;margin-top:8px;}
+footer{text-align:center;margin-top:24px;font-size:0.65rem;color:#30363d;padding-bottom:28px;line-height:2;}
+footer a{color:#484f58;text-decoration:none;}
+</style>
+</head>
+
+<body>
+<div class="header">
+  <div class="eyebrow">Zillow ZORI · Zillow ZHVI · Census ACS · BLS OES · 2015–2026</div>
+  <h1>When to Leave a City — Based on What You Do</h1>
+  <p class="header-sub">Rent trends, home price momentum, and real purchasing power vary dramatically by occupation and city. <strong>A software engineer and a teacher face completely different leave signals in the same metro.</strong> Pick your job — see the math.</p>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <span class="ctrl-label">Your Occupation:</span>
+  <select class="ctrl-select" id="occSelect" onchange="update()">
+    <option value="Software Developer">Software Developer</option>
+    <option value="Registered Nurse">Registered Nurse</option>
+    <option value="Teacher (K-12)">Teacher (K-12)</option>
+    <option value="Financial Analyst">Financial Analyst</option>
+    <option value="Marketing Manager">Marketing Manager</option>
+    <option value="Electrician">Electrician</option>
+  </select>
+  <span class="ctrl-label" style="margin-left:12px;">Sort by:</span>
+  <select class="ctrl-select" id="sortSelect" onchange="update()">
+    <option value="leave_urgency">Leave Urgency</option>
+    <option value="pp">Purchasing Power</option>
+    <option value="rent">Rent (high→low)</option>
+    <option value="hv_5yr">Home Price 5yr %</option>
+  </select>
+  <span class="ctrl-hint">34 major metros · Zillow live data · BLS OES wages</span>
+</div>
+
+<!-- Main grid -->
+<div class="main-grid">
+  <!-- City list -->
+  <div class="city-list-wrap">
+    <div class="city-list-header">
+      <span>Metro</span>
+      <span>Rent · Signal</span>
+    </div>
+    <div class="city-list" id="cityList"></div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+    <!-- Stat cards -->
+    <div class="panel-top" id="statCards"></div>
+
+    <!-- Two charts side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="chart-card">
+        <div class="card-title">Rent Trend</div>
+        <div class="card-sub" id="rentTrendSub">Annual median rent · Zillow ZORI</div>
+        <div id="rentTrendChart" style="width:100%;height:220px;"></div>
+      </div>
+      <div class="chart-card">
+        <div class="card-title">Home Value Trend</div>
+        <div class="card-sub" id="hvTrendSub">Median home value · Zillow ZHVI</div>
+        <div id="hvTrendChart" style="width:100%;height:220px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Purchasing power comparison — all metros for selected occupation -->
+<div class="sec-title">📊 Purchasing Power — All Metros for Your Occupation</div>
+<div class="full-card" style="margin-top:10px;">
+  <div class="fc-title" id="ppChartTitle">Software Developer — Wage ÷ Annual Rent by Metro</div>
+  <div class="fc-sub">Higher = salary covers rent more comfortably. 3.0x = salary is 3× annual rent. Sorted by purchasing power.</div>
+  <div id="ppChart" style="width:100%;height:360px;"></div>
+  <div class="src">Sources: BLS OES 2023 median annual wages · Zillow ZORI latest rent</div>
+</div>
+
+<!-- Leave urgency scatter -->
+<div class="full-card">
+  <div class="fc-title" id="scatterTitle">Leave Urgency vs. Purchasing Power — Software Developer</div>
+  <div class="fc-sub">X = purchasing power (wage ÷ annual rent) · Y = leave urgency (rent rising + unaffordable = high urgency) · Bubble size = current rent level</div>
+  <div id="urgencyScatter" style="width:100%;height:380px;"></div>
+  <div class="src">Sources: Zillow ZORI/ZHVI · Census ACS 2022 · BLS OES 2023</div>
+</div>
+
+<footer>
+  <a href="https://www.zillow.com/research/data/">Zillow Research Data (ZORI/ZHVI)</a> ·
+  <a href="https://www.census.gov/programs-surveys/acs/">Census ACS</a> ·
+  <a href="https://www.bls.gov/oes/">BLS Occupational Employment Statistics</a> ·
+  Built with Anton
+</footer>
+
+<script>
+const D = {"metros": [{"name": "New York, NY", "short": "New York", "rank": 1, "rent": 3258, "rent_yoy": 4.2, "rent_3yr": 13.1, "rent_5yr": 45.7, "rent_slope": 1.2, "home_value": 706888, "hv_yoy": 3.9, "hv_3yr": 16.7, "hv_5yr": 31.5, "ptr": 18.1, "income": 91562, "ri_ratio": 2.34, "stay_score": 3.8, "leave_urgency": 6.2, "afford_score": 3.4, "momentum_score": 2.6, "occupations": {"Software Developer": {"wage": 155000, "pp": 3.96}, "Registered Nurse": {"wage": 105000, "pp": 2.69}, "Teacher (K-12)": {"wage": 84000, "pp": 2.15}, "Financial Analyst": {"wage": 118000, "pp": 3.02}, "Marketing Manager": {"wage": 145000, "pp": 3.71}, "Electrician": {"wage": 90000, "pp": 2.3}}, "rent_ts": [["2018", 2332], ["2019", 2403], ["2020", 2347], ["2021", 2385], ["2022", 2780], ["2023", 2929], ["2024", 3045], ["2025", 3182], ["2026", 3254]], "hv_ts": [["2018", 476704], ["2019", 493219], ["2020", 510002], ["2021", 557946], ["2022", 604513], ["2023", 618250], ["2024", 659877], ["2025", 688557], ["2026", 705117]]}, {"name": "Los Angeles, CA", "short": "Los Angeles", "rank": 2, "rent": 2884, "rent_yoy": 1.0, "rent_3yr": 6.7, "rent_5yr": 27.7, "rent_slope": -0.0, "home_value": 954296, "hv_yoy": -0.8, "hv_3yr": 10.9, "hv_5yr": 29.0, "ptr": 27.6, "income": 87743, "ri_ratio": 2.54, "stay_score": 5.4, "leave_urgency": 4.6, "afford_score": 4.1, "momentum_score": 5.0, "occupations": {"Software Developer": {"wage": 145000, "pp": 4.19}, "Registered Nurse": {"wage": 120000, "pp": 3.47}, "Teacher (K-12)": {"wage": 80000, "pp": 2.31}, "Financial Analyst": {"wage": 95000, "pp": 2.75}, "Marketing Manager": {"wage": 132000, "pp": 3.81}, "Electrician": {"wage": 82000, "pp": 2.37}}, "rent_ts": [["2018", 2127], ["2019", 2212], ["2020", 2237], ["2021", 2369], ["2022", 2647], ["2023", 2729], ["2024", 2792], ["2025", 2874], ["2026", 2887]], "hv_ts": [["2018", 632296], ["2019", 648023], ["2020", 681486], ["2021", 776301], ["2022", 880668], ["2023", 879466], ["2024", 938488], ["2025", 949048], ["2026", 953680]]}, {"name": "Chicago, IL", "short": "Chicago", "rank": 3, "rent": 2132, "rent_yoy": 5.3, "rent_3yr": 17.0, "rent_5yr": 39.0, "rent_slope": 1.8, "home_value": 338685, "hv_yoy": 4.0, "hv_3yr": 16.8, "hv_5yr": 32.7, "ptr": 13.2, "income": 82914, "ri_ratio": 3.24, "stay_score": 4.6, "leave_urgency": 5.4, "afford_score": 7.0, "momentum_score": 1.4, "occupations": {"Software Developer": {"wage": 132000, "pp": 5.16}, "Registered Nurse": {"wage": 80000, "pp": 3.13}, "Teacher (K-12)": {"wage": 68000, "pp": 2.66}, "Financial Analyst": {"wage": 96000, "pp": 3.75}, "Marketing Manager": {"wage": 118000, "pp": 4.61}, "Electrician": {"wage": 88000, "pp": 3.44}}, "rent_ts": [["2018", 1493], ["2019", 1535], ["2020", 1547], ["2021", 1596], ["2022", 1750], ["2023", 1860], ["2024", 1957], ["2025", 2069], ["2026", 2128]], "hv_ts": [["2018", 228414], ["2019", 234082], ["2020", 240676], ["2021", 266000], ["2022", 289707], ["2023", 298074], ["2024", 316310], ["2025", 329057], ["2026", 337824]]}, {"name": "Dallas, TX", "short": "Dallas", "rank": 4, "rent": 1630, "rent_yoy": 0.1, "rent_3yr": -0.0, "rent_5yr": 22.1, "rent_slope": -0.1, "home_value": 362142, "hv_yoy": -3.8, "hv_3yr": -4.0, "hv_5yr": 26.1, "ptr": 18.5, "income": 82823, "ri_ratio": 4.23, "stay_score": 7.9, "leave_urgency": 2.1, "afford_score": 10, "momentum_score": 5.2, "occupations": {"Software Developer": {"wage": 130000, "pp": 6.65}, "Registered Nurse": {"wage": 78000, "pp": 3.99}, "Teacher (K-12)": {"wage": 56000, "pp": 2.86}, "Financial Analyst": {"wage": 88000, "pp": 4.5}, "Marketing Manager": {"wage": 110000, "pp": 5.62}, "Electrician": {"wage": 62000, "pp": 3.17}}, "rent_ts": [["2018", 1221], ["2019", 1266], ["2020", 1292], ["2021", 1420], ["2022", 1602], ["2023", 1632], ["2024", 1626], ["2025", 1631], ["2026", 1631]], "hv_ts": [["2018", 247328], ["2019", 255894], ["2020", 267197], ["2021", 309561], ["2022", 375487], ["2023", 377569], ["2024", 379368], ["2025", 368735], ["2026", 362431]]}, {"name": "Houston, TX", "short": "Houston", "rank": 5, "rent": 1620, "rent_yoy": -0.5, "rent_3yr": 3.1, "rent_5yr": 20.0, "rent_slope": -0.6, "home_value": 304622, "hv_yoy": -2.1, "hv_3yr": -1.4, "hv_5yr": 24.2, "ptr": 15.7, "income": 74863, "ri_ratio": 3.85, "stay_score": 7.8, "leave_urgency": 2.2, "afford_score": 9.4, "momentum_score": 6.2, "occupations": {"Software Developer": {"wage": 122000, "pp": 6.28}, "Registered Nurse": {"wage": 78000, "pp": 4.01}, "Teacher (K-12)": {"wage": 56000, "pp": 2.88}, "Financial Analyst": {"wage": 90000, "pp": 4.63}, "Marketing Manager": {"wage": 110000, "pp": 5.66}, "Electrician": {"wage": 64000, "pp": 3.29}}, "rent_ts": [["2018", 1290], ["2019", 1312], ["2020", 1330], ["2021", 1416], ["2022", 1539], ["2023", 1584], ["2024", 1611], ["2025", 1628], ["2026", 1622]], "hv_ts": [["2018", 213868], ["2019", 222319], ["2020", 231036], ["2021", 260882], ["2022", 305701], ["2023", 309329], ["2024", 311729], ["2025", 307732], ["2026", 304782]]}, {"name": "Washington, DC", "short": "Washington", "rank": 6, "rent": 2331, "rent_yoy": -0.0, "rent_3yr": 8.6, "rent_5yr": 26.2, "rent_slope": -0.4, "home_value": 572410, "hv_yoy": -0.3, "hv_3yr": 8.0, "hv_5yr": 20.1, "ptr": 20.5, "income": 117432, "ri_ratio": 4.2, "stay_score": 7.6, "leave_urgency": 2.4, "afford_score": 10, "momentum_score": 5.8, "occupations": {"Software Developer": {"wage": 152000, "pp": 5.43}, "Registered Nurse": {"wage": 90000, "pp": 3.22}, "Teacher (K-12)": {"wage": 76000, "pp": 2.72}, "Financial Analyst": {"wage": 98000, "pp": 3.5}, "Marketing Manager": {"wage": 128000, "pp": 4.58}, "Electrician": {"wage": 78000, "pp": 2.79}}, "rent_ts": [["2018", 1799], ["2019", 1857], ["2020", 1867], ["2021", 1926], ["2022", 2096], ["2023", 2180], ["2024", 2276], ["2025", 2337], ["2026", 2333]], "hv_ts": [["2018", 410777], ["2019", 424260], ["2020", 446119], ["2021", 496149], ["2022", 532918], ["2023", 539024], ["2024", 560910], ["2025", 571972], ["2026", 572500]]}, {"name": "Philadelphia, PA", "short": "Philadelphia", "rank": 7, "rent": 1859, "rent_yoy": 3.0, "rent_3yr": 11.1, "rent_5yr": 28.9, "rent_slope": 1.1, "home_value": 376063, "hv_yoy": 2.6, "hv_3yr": 15.0, "hv_5yr": 34.4, "ptr": 16.9, "income": 58588, "ri_ratio": 2.63, "stay_score": 4.4, "leave_urgency": 5.6, "afford_score": 4.5, "momentum_score": 2.8, "occupations": {"Software Developer": {"wage": 128000, "pp": 5.74}, "Registered Nurse": {"wage": 80000, "pp": 3.59}, "Teacher (K-12)": {"wage": 64000, "pp": 2.87}, "Financial Analyst": {"wage": 90000, "pp": 4.03}, "Marketing Manager": {"wage": 115000, "pp": 5.16}, "Electrician": {"wage": 74000, "pp": 3.32}}, "rent_ts": [["2018", 1317], ["2019", 1368], ["2020", 1411], ["2021", 1502], ["2022", 1639], ["2023", 1700], ["2024", 1762], ["2025", 1824], ["2026", 1856]], "hv_ts": [["2018", 233911], ["2019", 242972], ["2020", 258363], ["2021", 291883], ["2022", 320967], ["2023", 336832], ["2024", 357568], ["2025", 370030], ["2026", 375644]]}, {"name": "Miami, FL", "short": "Miami", "rank": 8, "rent": 2654, "rent_yoy": 0.5, "rent_3yr": 3.8, "rent_5yr": 45.9, "rent_slope": 0.1, "home_value": 469603, "hv_yoy": -4.4, "hv_3yr": 2.9, "hv_5yr": 41.9, "ptr": 14.7, "income": 70769, "ri_ratio": 2.22, "stay_score": 5.3, "leave_urgency": 4.7, "afford_score": 2.9, "momentum_score": 4.8, "occupations": {"Software Developer": {"wage": 118000, "pp": 3.71}, "Registered Nurse": {"wage": 74000, "pp": 2.32}, "Teacher (K-12)": {"wage": 52000, "pp": 1.63}, "Financial Analyst": {"wage": 85000, "pp": 2.67}, "Marketing Manager": {"wage": 105000, "pp": 3.3}, "Electrician": {"wage": 58000, "pp": 1.82}}, "rent_ts": [["2018", 1645], ["2019", 1693], ["2020", 1736], ["2021", 2017], ["2022", 2473], ["2023", 2571], ["2024", 2616], ["2025", 2648], ["2026", 2654]], "hv_ts": [["2018", 283164], ["2019", 295593], ["2020", 310437], ["2021", 353330], ["2022", 433303], ["2023", 467686], ["2024", 492478], ["2025", 479525], ["2026", 469482]]}, {"name": "Atlanta, GA", "short": "Atlanta", "rank": 9, "rent": 1808, "rent_yoy": 1.4, "rent_3yr": 2.9, "rent_5yr": 26.1, "rent_slope": -0.2, "home_value": 376108, "hv_yoy": -2.6, "hv_3yr": 0.9, "hv_5yr": 33.7, "ptr": 17.3, "income": 84876, "ri_ratio": 3.91, "stay_score": 7.7, "leave_urgency": 2.3, "afford_score": 9.6, "momentum_score": 5.4, "occupations": {"Software Developer": {"wage": 128000, "pp": 5.9}, "Registered Nurse": {"wage": 75000, "pp": 3.46}, "Teacher (K-12)": {"wage": 52000, "pp": 2.4}, "Financial Analyst": {"wage": 84000, "pp": 3.87}, "Marketing Manager": {"wage": 108000, "pp": 4.98}, "Electrician": {"wage": 62000, "pp": 2.86}}, "rent_ts": [["2018", 1211], ["2019", 1285], ["2020", 1346], ["2021", 1542], ["2022", 1722], ["2023", 1756], ["2024", 1762], ["2025", 1798], ["2026", 1810]], "hv_ts": [["2018", 226871], ["2019", 242336], ["2020", 257986], ["2021", 304400], ["2022", 369386], ["2023", 377733], ["2024", 388868], ["2025", 381141], ["2026", 376290]]}, {"name": "Boston, MA", "short": "Boston", "rank": 10, "rent": 3098, "rent_yoy": 1.6, "rent_3yr": 10.5, "rent_5yr": 34.3, "rent_slope": 0.2, "home_value": 713764, "hv_yoy": 1.6, "hv_3yr": 15.1, "hv_5yr": 31.0, "ptr": 19.2, "income": 104299, "ri_ratio": 2.81, "stay_score": 5.3, "leave_urgency": 4.7, "afford_score": 5.2, "momentum_score": 4.6, "occupations": {"Software Developer": {"wage": 148000, "pp": 3.98}, "Registered Nurse": {"wage": 98000, "pp": 2.64}, "Teacher (K-12)": {"wage": 78000, "pp": 2.1}, "Financial Analyst": {"wage": 102000, "pp": 2.74}, "Marketing Manager": {"wage": 128000, "pp": 3.44}, "Electrician": {"wage": 82000, "pp": 2.21}}, "rent_ts": [["2018", 2304], ["2019", 2381], ["2020", 2365], ["2021", 2423], ["2022", 2685], ["2023", 2866], ["2024", 2988], ["2025", 3076], ["2026", 3096]], "hv_ts": [["2018", 468683], ["2019", 480789], ["2020", 504527], ["2021", 567896], ["2022", 620714], ["2023", 640790], ["2024", 686779], ["2025", 703432], ["2026", 713224]]}, {"name": "Phoenix, AZ", "short": "Phoenix", "rank": 11, "rent": 1724, "rent_yoy": -0.8, "rent_3yr": -0.3, "rent_5yr": 22.8, "rent_slope": -0.4, "home_value": 446248, "hv_yoy": -2.4, "hv_3yr": -0.7, "hv_5yr": 27.6, "ptr": 21.6, "income": 82884, "ri_ratio": 4.01, "stay_score": 8.0, "leave_urgency": 2.0, "afford_score": 10, "momentum_score": 5.8, "occupations": {"Software Developer": {"wage": 115000, "pp": 5.56}, "Registered Nurse": {"wage": 80000, "pp": 3.87}, "Teacher (K-12)": {"wage": 50000, "pp": 2.42}, "Electrician": {"wage": 60000, "pp": 2.9}}, "rent_ts": [["2018", 1129], ["2019", 1219], ["2020", 1310], ["2021", 1542], ["2022", 1728], ["2023", 1733], ["2024", 1737], ["2025", 1733], ["2026", 1726]], "hv_ts": [["2018", 268706], ["2019", 286027], ["2020", 314843], ["2021", 391053], ["2022", 474993], ["2023", 451274], ["2024", 461748], ["2025", 449757], ["2026", 445980]]}, {"name": "San Francisco, CA", "short": "San Francisco", "rank": 12, "rent": 3103, "rent_yoy": 6.2, "rent_3yr": 10.4, "rent_5yr": 24.1, "rent_slope": 2.5, "home_value": 1116383, "hv_yoy": -2.3, "hv_3yr": 2.0, "hv_5yr": 10.5, "ptr": 30.0, "income": 128151, "ri_ratio": 3.44, "stay_score": 5.2, "leave_urgency": 4.8, "afford_score": 7.8, "momentum_score": 0, "occupations": {"Software Developer": {"wage": 168000, "pp": 4.51}, "Registered Nurse": {"wage": 133000, "pp": 3.57}, "Teacher (K-12)": {"wage": 82000, "pp": 2.2}, "Financial Analyst": {"wage": 112000, "pp": 3.01}, "Marketing Manager": {"wage": 148000, "pp": 3.97}, "Electrician": {"wage": 98000, "pp": 2.63}}, "rent_ts": [["2018", 2597], ["2019", 2677], ["2020", 2624], ["2021", 2595], ["2022", 2784], ["2023", 2810], ["2024", 2851], ["2025", 2988], ["2026", 3092]], "hv_ts": [["2018", 910135], ["2019", 917898], ["2020", 945888], ["2021", 1071177], ["2022", 1182370], ["2023", 1102024], ["2024", 1135428], ["2025", 1120054], ["2026", 1115316]]}, {"name": "Riverside, CA", "short": "Riverside", "rank": 13, "rent": 2478, "rent_yoy": 1.5, "rent_3yr": 7.5, "rent_5yr": 31.4, "rent_slope": 0.6, "home_value": 580340, "hv_yoy": -1.9, "hv_3yr": 5.3, "hv_5yr": 32.5, "ptr": 19.5, "income": 82803, "ri_ratio": 2.78, "stay_score": 5.5, "leave_urgency": 4.5, "afford_score": 5.1, "momentum_score": 3.8, "occupations": {"Software Developer": {"wage": 108000, "pp": 3.63}, "Registered Nurse": {"wage": 98000, "pp": 3.3}, "Teacher (K-12)": {"wage": 72000, "pp": 2.42}, "Financial Analyst": {"wage": 78000, "pp": 2.62}, "Marketing Manager": {"wage": 98000, "pp": 3.3}, "Electrician": {"wage": 72000, "pp": 2.42}}, "rent_ts": [["2018", 1559], ["2019", 1641], ["2020", 1736], ["2021", 2017], ["2022", 2260], ["2023", 2324], ["2024", 2386], ["2025", 2454], ["2026", 2477]], "hv_ts": [["2018", 363649], ["2019", 376507], ["2020", 397332], ["2021", 474829], ["2022", 559104], ["2023", 557338], ["2024", 584881], ["2025", 582562], ["2026", 579948]]}, {"name": "Detroit, MI", "short": "Detroit", "rank": 14, "rent": 1461, "rent_yoy": 2.3, "rent_3yr": 11.1, "rent_5yr": 29.1, "rent_slope": 0.8, "home_value": 258238, "hv_yoy": 3.1, "hv_3yr": 14.1, "hv_5yr": 31.4, "ptr": 14.7, "income": 71265, "ri_ratio": 4.06, "stay_score": 6.5, "leave_urgency": 3.5, "afford_score": 10, "momentum_score": 3.4, "occupations": {"Software Developer": {"wage": 115000, "pp": 6.56}, "Registered Nurse": {"wage": 72000, "pp": 4.11}, "Teacher (K-12)": {"wage": 58000, "pp": 3.31}, "Financial Analyst": {"wage": 80000, "pp": 4.56}, "Marketing Manager": {"wage": 100000, "pp": 5.7}, "Electrician": {"wage": 72000, "pp": 4.11}}, "rent_ts": [["2018", 972], ["2019", 1015], ["2020", 1063], ["2021", 1180], ["2022", 1288], ["2023", 1330], ["2024", 1389], ["2025", 1441], ["2026", 1460]], "hv_ts": [["2018", 161918], ["2019", 172781], ["2020", 181689], ["2021", 206993], ["2022", 226223], ["2023", 231593], ["2024", 244036], ["2025", 252932], ["2026", 257890]]}, {"name": "Seattle, WA", "short": "Seattle", "rank": 15, "rent": 2181, "rent_yoy": 1.5, "rent_3yr": 7.2, "rent_5yr": 28.3, "rent_slope": -0.1, "home_value": 740211, "hv_yoy": -1.6, "hv_3yr": 6.5, "hv_5yr": 25.7, "ptr": 28.3, "income": 106909, "ri_ratio": 4.08, "stay_score": 7.6, "leave_urgency": 2.4, "afford_score": 10, "momentum_score": 5.2, "occupations": {"Software Developer": {"wage": 162000, "pp": 6.19}, "Registered Nurse": {"wage": 103000, "pp": 3.94}, "Teacher (K-12)": {"wage": 72000, "pp": 2.75}, "Financial Analyst": {"wage": 95000, "pp": 3.63}, "Marketing Manager": {"wage": 130000, "pp": 4.97}, "Electrician": {"wage": 92000, "pp": 3.52}}, "rent_ts": [["2018", 1639], ["2019", 1705], ["2020", 1733], ["2021", 1810], ["2022", 2009], ["2023", 2046], ["2024", 2110], ["2025", 2169], ["2026", 2182]], "hv_ts": [["2018", 490642], ["2019", 500914], ["2020", 536037], ["2021", 633015], ["2022", 727213], ["2023", 698927], ["2024", 732127], ["2025", 740432], ["2026", 740383]]}, {"name": "Minneapolis, MN", "short": "Minneapolis", "rank": 16, "rent": 1664, "rent_yoy": 4.0, "rent_3yr": 9.8, "rent_5yr": 20.9, "rent_slope": 1.4, "home_value": 380652, "hv_yoy": 1.7, "hv_3yr": 6.1, "hv_5yr": 19.0, "ptr": 19.1, "income": 91341, "ri_ratio": 4.57, "stay_score": 6.3, "leave_urgency": 3.7, "afford_score": 10, "momentum_score": 2.2, "occupations": {"Software Developer": {"wage": 125000, "pp": 6.26}, "Registered Nurse": {"wage": 82000, "pp": 4.11}, "Teacher (K-12)": {"wage": 64000, "pp": 3.21}, "Financial Analyst": {"wage": 88000, "pp": 4.41}, "Marketing Manager": {"wage": 112000, "pp": 5.61}, "Electrician": {"wage": 78000, "pp": 3.91}}, "rent_ts": [["2018", 1284], ["2019", 1341], ["2020", 1374], ["2021", 1414], ["2022", 1488], ["2023", 1527], ["2024", 1570], ["2025", 1626], ["2026", 1662]], "hv_ts": [["2018", 271839], ["2019", 284527], ["2020", 299636], ["2021", 335215], ["2022", 362400], ["2023", 362539], ["2024", 367175], ["2025", 374097], ["2026", 380070]]}, {"name": "San Diego, CA", "short": "San Diego", "rank": 17, "rent": 2871, "rent_yoy": 1.4, "rent_3yr": 6.8, "rent_5yr": 35.8, "rent_slope": 0.7, "home_value": 928459, "hv_yoy": -2.1, "hv_3yr": 10.8, "hv_5yr": 35.4, "ptr": 26.9, "income": 98928, "ri_ratio": 2.87, "stay_score": 5.6, "leave_urgency": 4.4, "afford_score": 5.5, "momentum_score": 3.6, "occupations": {"Software Developer": {"wage": 142000, "pp": 4.12}, "Registered Nurse": {"wage": 115000, "pp": 3.34}, "Teacher (K-12)": {"wage": 78000, "pp": 2.26}, "Financial Analyst": {"wage": 85000, "pp": 2.47}, "Marketing Manager": {"wage": 118000, "pp": 3.43}, "Electrician": {"wage": 78000, "pp": 2.26}}, "rent_ts": [["2018", 1914], ["2019", 1987], ["2020", 2038], ["2021", 2251], ["2022", 2601], ["2023", 2734], ["2024", 2784], ["2025", 2842], ["2026", 2869]], "hv_ts": [["2018", 585075], ["2019", 594671], ["2020", 626913], ["2021", 736657], ["2022", 863183], ["2023", 867308], ["2024", 939239], ["2025", 933880], ["2026", 927950]]}, {"name": "Tampa, FL", "short": "Tampa", "rank": 18, "rent": 1976, "rent_yoy": -1.7, "rent_3yr": 2.7, "rent_5yr": 36.4, "rent_slope": -2.1, "home_value": 354930, "hv_yoy": -4.8, "hv_3yr": -4.8, "hv_5yr": 33.9, "ptr": 15.0, "income": 69290, "ri_ratio": 2.92, "stay_score": 7.7, "leave_urgency": 2.3, "afford_score": 5.7, "momentum_score": 9.2, "occupations": {"Software Developer": {"wage": 108000, "pp": 4.55}, "Registered Nurse": {"wage": 72000, "pp": 3.04}, "Teacher (K-12)": {"wage": 48000, "pp": 2.02}, "Financial Analyst": {"wage": 76000, "pp": 3.21}, "Marketing Manager": {"wage": 95000, "pp": 4.01}, "Electrician": {"wage": 58000, "pp": 2.45}}, "rent_ts": [["2018", 1241], ["2019", 1299], ["2020", 1361], ["2021", 1595], ["2022", 1875], ["2023", 1942], ["2024", 1967], ["2025", 2012], ["2026", 1980]], "hv_ts": [["2018", 214431], ["2019", 226833], ["2020", 243487], ["2021", 290242], ["2022", 366306], ["2023", 375860], ["2024", 381692], ["2025", 363173], ["2026", 354754]]}, {"name": "Denver, CO", "short": "Denver", "rank": 19, "rent": 1844, "rent_yoy": -0.9, "rent_3yr": 0.6, "rent_5yr": 19.7, "rent_slope": -0.2, "home_value": 566588, "hv_yoy": -3.2, "hv_3yr": -1.5, "hv_5yr": 18.0, "ptr": 25.6, "income": 98975, "ri_ratio": 4.47, "stay_score": 7.9, "leave_urgency": 2.1, "afford_score": 10, "momentum_score": 5.4, "occupations": {"Software Developer": {"wage": 138000, "pp": 6.24}, "Registered Nurse": {"wage": 82000, "pp": 3.71}, "Teacher (K-12)": {"wage": 54000, "pp": 2.44}, "Financial Analyst": {"wage": 86000, "pp": 3.89}, "Marketing Manager": {"wage": 112000, "pp": 5.06}, "Electrician": {"wage": 72000, "pp": 3.25}}, "rent_ts": [["2018", 1447], ["2019", 1502], ["2020", 1521], ["2021", 1630], ["2022", 1795], ["2023", 1851], ["2024", 1880], ["2025", 1853], ["2026", 1844]], "hv_ts": [["2018", 406149], ["2019", 423768], ["2020", 446788], ["2021", 516376], ["2022", 591299], ["2023", 577025], ["2024", 584318], ["2025", 573848], ["2026", 567362]]}, {"name": "Baltimore, MD", "short": "Baltimore", "rank": 20, "rent": 1857, "rent_yoy": 2.4, "rent_3yr": 9.4, "rent_5yr": 26.8, "rent_slope": 0.9, "home_value": 394495, "hv_yoy": 0.8, "hv_3yr": 8.5, "hv_5yr": 22.4, "ptr": 17.7, "income": 90505, "ri_ratio": 4.06, "stay_score": 6.7, "leave_urgency": 3.3, "afford_score": 10, "momentum_score": 3.2, "occupations": {"Software Developer": {"wage": 130000, "pp": 5.83}, "Registered Nurse": {"wage": 82000, "pp": 3.68}, "Teacher (K-12)": {"wage": 62000, "pp": 2.78}, "Financial Analyst": {"wage": 88000, "pp": 3.95}, "Marketing Manager": {"wage": 110000, "pp": 4.94}, "Electrician": {"wage": 68000, "pp": 3.05}}, "rent_ts": [["2018", 1356], ["2019", 1390], ["2020", 1419], ["2021", 1532], ["2022", 1660], ["2023", 1715], ["2024", 1770], ["2025", 1829], ["2026", 1856]], "hv_ts": [["2018", 282962], ["2019", 291053], ["2020", 302876], ["2021", 335710], ["2022", 360474], ["2023", 370994], ["2024", 383826], ["2025", 392359], ["2026", 394196]]}, {"name": "St. Louis, MO", "short": "St. Louis", "rank": 21, "rent": 1395, "rent_yoy": 3.3, "rent_3yr": 14.6, "rent_5yr": 34.4, "rent_slope": 1.5, "home_value": 265644, "hv_yoy": 2.5, "hv_3yr": 12.9, "hv_5yr": 31.0, "ptr": 15.9, "income": 74531, "ri_ratio": 4.45, "stay_score": 6.0, "leave_urgency": 4.0, "afford_score": 10, "momentum_score": 2.0, "occupations": {"Software Developer": {"wage": 108000, "pp": 6.45}, "Registered Nurse": {"wage": 68000, "pp": 4.06}, "Teacher (K-12)": {"wage": 52000, "pp": 3.11}, "Financial Analyst": {"wage": 78000, "pp": 4.66}, "Marketing Manager": {"wage": 96000, "pp": 5.73}, "Electrician": {"wage": 68000, "pp": 4.06}}, "rent_ts": [["2018", 928], ["2019", 960], ["2020", 1001], ["2021", 1073], ["2022", 1179], ["2023", 1246], ["2024", 1308], ["2025", 1364], ["2026", 1394]], "hv_ts": [["2018", 171252], ["2019", 177897], ["2020", 188361], ["2021", 211386], ["2022", 231996], ["2023", 242101], ["2024", 253104], ["2025", 260154], ["2026", 265220]]}, {"name": "Orlando, FL", "short": "Orlando", "rank": 22, "rent": 1922, "rent_yoy": 0.1, "rent_3yr": 1.5, "rent_5yr": 32.4, "rent_slope": -0.2, "home_value": 383850, "hv_yoy": -4.0, "hv_3yr": -1.3, "hv_5yr": 34.6, "ptr": 16.6, "income": 71857, "ri_ratio": 3.12, "stay_score": 6.7, "leave_urgency": 3.3, "afford_score": 6.5, "momentum_score": 5.4, "occupations": {"Software Developer": {"wage": 105000, "pp": 4.55}, "Registered Nurse": {"wage": 70000, "pp": 3.04}, "Teacher (K-12)": {"wage": 48000, "pp": 2.08}, "Financial Analyst": {"wage": 72000, "pp": 3.12}, "Marketing Manager": {"wage": 92000, "pp": 3.99}, "Electrician": {"wage": 56000, "pp": 2.43}}, "rent_ts": [["2018", 1314], ["2019", 1376], ["2020", 1408], ["2021", 1573], ["2022", 1842], ["2023", 1895], ["2024", 1908], ["2025", 1922], ["2026", 1924]], "hv_ts": [["2018", 236974], ["2019", 252659], ["2020", 267688], ["2021", 305111], ["2022", 376751], ["2023", 393354], ["2024", 402855], ["2025", 391192], ["2026", 383848]]}, {"name": "Charlotte, NC", "short": "Charlotte", "rank": 23, "rent": 1716, "rent_yoy": 0.4, "rent_3yr": 3.3, "rent_5yr": 28.3, "rent_slope": -0.4, "home_value": 382567, "hv_yoy": -0.8, "hv_3yr": 4.5, "hv_5yr": 37.8, "ptr": 18.6, "income": 77154, "ri_ratio": 3.75, "stay_score": 7.4, "leave_urgency": 2.6, "afford_score": 9.0, "momentum_score": 5.8, "occupations": {"Software Developer": {"wage": 118000, "pp": 5.73}, "Registered Nurse": {"wage": 72000, "pp": 3.5}, "Teacher (K-12)": {"wage": 48000, "pp": 2.33}, "Financial Analyst": {"wage": 90000, "pp": 4.37}, "Marketing Manager": {"wage": 100000, "pp": 4.86}, "Electrician": {"wage": 58000, "pp": 2.82}}, "rent_ts": [["2018", 1180], ["2019", 1240], ["2020", 1283], ["2021", 1423], ["2022", 1609], ["2023", 1673], ["2024", 1690], ["2025", 1717], ["2026", 1718]], "hv_ts": [["2018", 220986], ["2019", 234116], ["2020", 252128], ["2021", 301089], ["2022", 363918], ["2023", 370246], ["2024", 383488], ["2025", 383109], ["2026", 382439]]}, {"name": "San Antonio, TX", "short": "San Antonio", "rank": 24, "rent": 1392, "rent_yoy": -1.6, "rent_3yr": -3.2, "rent_5yr": 13.9, "rent_slope": -1.0, "home_value": 275829, "hv_yoy": -2.6, "hv_3yr": -7.1, "hv_5yr": 17.0, "ptr": 16.5, "income": 70538, "ri_ratio": 4.22, "stay_score": 8.4, "leave_urgency": 1.6, "afford_score": 10, "momentum_score": 7.0, "occupations": {"Software Developer": {"wage": 105000, "pp": 6.29}, "Registered Nurse": {"wage": 72000, "pp": 4.31}, "Teacher (K-12)": {"wage": 52000, "pp": 3.11}, "Financial Analyst": {"wage": 74000, "pp": 4.43}, "Marketing Manager": {"wage": 90000, "pp": 5.39}, "Electrician": {"wage": 58000, "pp": 3.47}}, "rent_ts": [["2018", 1133], ["2019", 1166], ["2020", 1192], ["2021", 1289], ["2022", 1418], ["2023", 1433], ["2024", 1420], ["2025", 1408], ["2026", 1394]], "hv_ts": [["2018", 200419], ["2019", 208564], ["2020", 220122], ["2021", 251716], ["2022", 294308], ["2023", 294501], ["2024", 287100], ["2025", 279150], ["2026", 275922]]}, {"name": "Portland, OR", "short": "Portland", "rank": 25, "rent": 1779, "rent_yoy": 0.9, "rent_3yr": 3.0, "rent_5yr": 22.1, "rent_slope": 0.1, "home_value": 541939, "hv_yoy": -1.3, "hv_3yr": 2.1, "hv_5yr": 17.2, "ptr": 25.4, "income": 84312, "ri_ratio": 3.95, "stay_score": 7.4, "leave_urgency": 2.6, "afford_score": 9.8, "momentum_score": 4.8, "occupations": {"Software Developer": {"wage": 130000, "pp": 6.09}, "Registered Nurse": {"wage": 92000, "pp": 4.31}, "Teacher (K-12)": {"wage": 62000, "pp": 2.9}, "Financial Analyst": {"wage": 82000, "pp": 3.84}, "Marketing Manager": {"wage": 105000, "pp": 4.92}, "Electrician": {"wage": 74000, "pp": 3.47}}, "rent_ts": [["2018", 1345], ["2019", 1395], ["2020", 1425], ["2021", 1530], ["2022", 1677], ["2023", 1710], ["2024", 1738], ["2025", 1770], ["2026", 1779]], "hv_ts": [["2018", 394033], ["2019", 404043], ["2020", 425804], ["2021", 492087], ["2022", 548246], ["2023", 534884], ["2024", 542601], ["2025", 542370], ["2026", 541954]]}, {"name": "Sacramento, CA", "short": "Sacramento", "rank": 26, "rent": 2211, "rent_yoy": 2.1, "rent_3yr": 7.5, "rent_5yr": 23.0, "rent_slope": 0.7, "home_value": 572872, "hv_yoy": -2.1, "hv_3yr": 1.9, "hv_5yr": 16.9, "ptr": 21.6, "income": 89237, "ri_ratio": 3.36, "stay_score": 6.2, "leave_urgency": 3.8, "afford_score": 7.5, "momentum_score": 3.6, "occupations": {"Software Developer": {"wage": 118000, "pp": 4.45}, "Registered Nurse": {"wage": 118000, "pp": 4.45}, "Teacher (K-12)": {"wage": 72000, "pp": 2.71}, "Financial Analyst": {"wage": 80000, "pp": 3.02}, "Marketing Manager": {"wage": 102000, "pp": 3.84}, "Electrician": {"wage": 75000, "pp": 2.83}}, "rent_ts": [["2018", 1539], ["2019", 1618], ["2020", 1694], ["2021", 1889], ["2022", 2041], ["2023", 2074], ["2024", 2135], ["2025", 2184], ["2026", 2210]], "hv_ts": [["2018", 412691], ["2019", 426038], ["2020", 448084], ["2021", 528053], ["2022", 595396], ["2023", 565823], ["2024", 581040], ["2025", 576727], ["2026", 572846]]}, {"name": "Pittsburgh, PA", "short": "Pittsburgh", "rank": 27, "rent": 1446, "rent_yoy": 3.8, "rent_3yr": 12.2, "rent_5yr": 28.2, "rent_slope": 1.2, "home_value": 221249, "hv_yoy": 1.4, "hv_3yr": 9.4, "hv_5yr": 19.2, "ptr": 12.8, "income": 70607, "ri_ratio": 4.07, "stay_score": 6.4, "leave_urgency": 3.6, "afford_score": 10, "momentum_score": 2.6, "occupations": {"Software Developer": {"wage": 112000, "pp": 6.45}, "Registered Nurse": {"wage": 72000, "pp": 4.15}, "Teacher (K-12)": {"wage": 58000, "pp": 3.34}, "Financial Analyst": {"wage": 78000, "pp": 4.5}, "Marketing Manager": {"wage": 95000, "pp": 5.47}, "Electrician": {"wage": 68000, "pp": 3.92}}, "rent_ts": [["2018", 1029], ["2019", 1069], ["2020", 1106], ["2021", 1166], ["2022", 1252], ["2023", 1305], ["2024", 1360], ["2025", 1417], ["2026", 1445]], "hv_ts": [["2018", 154254], ["2019", 160232], ["2020", 170962], ["2021", 193122], ["2022", 204547], ["2023", 206699], ["2024", 215847], ["2025", 219596], ["2026", 221084]]}, {"name": "Cincinnati, OH", "short": "Cincinnati", "rank": 28, "rent": 1536, "rent_yoy": 3.5, "rent_3yr": 13.1, "rent_5yr": 35.5, "rent_slope": 1.3, "home_value": 299701, "hv_yoy": 2.6, "hv_3yr": 13.9, "hv_5yr": 34.4, "ptr": 16.3, "income": 75062, "ri_ratio": 4.07, "stay_score": 6.2, "leave_urgency": 3.8, "afford_score": 10, "momentum_score": 2.4, "occupations": {"Software Developer": {"wage": 105000, "pp": 5.7}, "Registered Nurse": {"wage": 68000, "pp": 3.69}, "Teacher (K-12)": {"wage": 54000, "pp": 2.93}, "Financial Analyst": {"wage": 76000, "pp": 4.12}, "Marketing Manager": {"wage": 95000, "pp": 5.15}, "Electrician": {"wage": 65000, "pp": 3.53}}, "rent_ts": [["2018", 990], ["2019", 1040], ["2020", 1094], ["2021", 1177], ["2022", 1299], ["2023", 1383], ["2024", 1452], ["2025", 1504], ["2026", 1532]], "hv_ts": [["2018", 177363], ["2019", 188890], ["2020", 203433], ["2021", 233611], ["2022", 259021], ["2023", 270795], ["2024", 284421], ["2025", 294174], ["2026", 299222]]}, {"name": "Austin, TX", "short": "Austin", "rank": 29, "rent": 1563, "rent_yoy": -2.6, "rent_3yr": -9.6, "rent_5yr": 12.2, "rent_slope": -1.3, "home_value": 424642, "hv_yoy": -5.9, "hv_3yr": -14.9, "hv_5yr": 11.6, "ptr": 22.6, "income": 94604, "ri_ratio": 5.04, "stay_score": 8.9, "leave_urgency": 1.1, "afford_score": 10, "momentum_score": 7.6, "occupations": {"Software Developer": {"wage": 142000, "pp": 7.57}, "Registered Nurse": {"wage": 78000, "pp": 4.16}, "Teacher (K-12)": {"wage": 56000, "pp": 2.99}, "Financial Analyst": {"wage": 84000, "pp": 4.48}, "Marketing Manager": {"wage": 112000, "pp": 5.97}, "Electrician": {"wage": 62000, "pp": 3.31}}, "rent_ts": [["2018", 1284], ["2019", 1343], ["2020", 1362], ["2021", 1521], ["2022", 1720], ["2023", 1705], ["2024", 1642], ["2025", 1590], ["2026", 1564]], "hv_ts": [["2018", 307453], ["2019", 316447], ["2020", 340920], ["2021", 444504], ["2022", 536595], ["2023", 485684], ["2024", 462745], ["2025", 439180], ["2026", 425642]]}, {"name": "Las Vegas, NV", "short": "Las Vegas", "rank": 30, "rent": 1720, "rent_yoy": -0.3, "rent_3yr": 3.3, "rent_5yr": 24.7, "rent_slope": -0.4, "home_value": 427633, "hv_yoy": -2.4, "hv_3yr": 4.9, "hv_5yr": 34.2, "ptr": 20.7, "income": 70797, "ri_ratio": 3.43, "stay_score": 7.1, "leave_urgency": 2.9, "afford_score": 7.7, "momentum_score": 5.8, "occupations": {"Software Developer": {"wage": 102000, "pp": 4.94}, "Registered Nurse": {"wage": 85000, "pp": 4.12}, "Teacher (K-12)": {"wage": 56000, "pp": 2.71}, "Financial Analyst": {"wage": 72000, "pp": 3.49}, "Marketing Manager": {"wage": 92000, "pp": 4.46}, "Electrician": {"wage": 70000, "pp": 3.39}}, "rent_ts": [["2018", 1165], ["2019", 1239], ["2020", 1290], ["2021", 1510], ["2022", 1681], ["2023", 1671], ["2024", 1705], ["2025", 1723], ["2026", 1721]], "hv_ts": [["2018", 271099], ["2019", 291558], ["2020", 301328], ["2021", 347519], ["2022", 423394], ["2023", 406631], ["2024", 427213], ["2025", 433505], ["2026", 427761]]}, {"name": "Kansas City, MO", "short": "Kansas City", "rank": 31, "rent": 1481, "rent_yoy": 3.4, "rent_3yr": 14.2, "rent_5yr": 35.3, "rent_slope": 0.8, "home_value": 316796, "hv_yoy": 2.8, "hv_3yr": 12.2, "hv_5yr": 34.6, "ptr": 17.8, "income": 75280, "ri_ratio": 4.24, "stay_score": 6.4, "leave_urgency": 3.6, "afford_score": 10, "momentum_score": 3.4, "occupations": {"Software Developer": {"wage": 108000, "pp": 6.08}, "Registered Nurse": {"wage": 68000, "pp": 3.83}, "Teacher (K-12)": {"wage": 52000, "pp": 2.93}, "Financial Analyst": {"wage": 76000, "pp": 4.28}, "Marketing Manager": {"wage": 96000, "pp": 5.4}, "Electrician": {"wage": 65000, "pp": 3.66}}, "rent_ts": [["2018", 974], ["2019", 1011], ["2020", 1059], ["2021", 1137], ["2022", 1248], ["2023", 1322], ["2024", 1389], ["2025", 1455], ["2026", 1480]], "hv_ts": [["2018", 192234], ["2019", 202448], ["2020", 216544], ["2021", 248501], ["2022", 277420], ["2023", 289672], ["2024", 301386], ["2025", 309375], ["2026", 316290]]}, {"name": "Columbus, OH", "short": "Columbus", "rank": 32, "rent": 1484, "rent_yoy": 1.5, "rent_3yr": 10.6, "rent_5yr": 30.2, "rent_slope": 0.3, "home_value": 321956, "hv_yoy": 1.1, "hv_3yr": 11.2, "hv_5yr": 34.2, "ptr": 18.1, "income": 54106, "ri_ratio": 3.04, "stay_score": 5.6, "leave_urgency": 4.4, "afford_score": 6.2, "momentum_score": 4.4, "occupations": {"Software Developer": {"wage": 110000, "pp": 6.18}, "Registered Nurse": {"wage": 70000, "pp": 3.93}, "Teacher (K-12)": {"wage": 58000, "pp": 3.26}, "Financial Analyst": {"wage": 76000, "pp": 4.27}, "Marketing Manager": {"wage": 95000, "pp": 5.33}, "Electrician": {"wage": 62000, "pp": 3.48}}, "rent_ts": [["2018", 1010], ["2019", 1054], ["2020", 1103], ["2021", 1188], ["2022", 1296], ["2023", 1363], ["2024", 1421], ["2025", 1476], ["2026", 1483]], "hv_ts": [["2018", 189827], ["2019", 203170], ["2020", 219681], ["2021", 252243], ["2022", 284512], ["2023", 297355], ["2024", 312176], ["2025", 318561], ["2026", 321641]]}, {"name": "Indianapolis, IN", "short": "Indianapolis", "rank": 34, "rent": 1486, "rent_yoy": 2.4, "rent_3yr": 11.9, "rent_5yr": 34.3, "rent_slope": 0.5, "home_value": 286468, "hv_yoy": 1.2, "hv_3yr": 7.6, "hv_5yr": 35.4, "ptr": 16.1, "income": 75824, "ri_ratio": 4.25, "stay_score": 6.8, "leave_urgency": 3.2, "afford_score": 10, "momentum_score": 4.0, "occupations": {"Software Developer": {"wage": 108000, "pp": 6.06}, "Registered Nurse": {"wage": 68000, "pp": 3.81}, "Teacher (K-12)": {"wage": 50000, "pp": 2.8}, "Financial Analyst": {"wage": 75000, "pp": 4.21}, "Marketing Manager": {"wage": 92000, "pp": 5.16}, "Electrician": {"wage": 62000, "pp": 3.48}}, "rent_ts": [["2018", 957], ["2019", 996], ["2020", 1054], ["2021", 1153], ["2022", 1280], ["2023", 1349], ["2024", 1410], ["2025", 1470], ["2026", 1487]], "hv_ts": [["2018", 166757], ["2019", 178477], ["2020", 193383], ["2021", 226189], ["2022", 262154], ["2023", 269468], ["2024", 277337], ["2025", 283420], ["2026", 286102]]}, {"name": "Cleveland, OH", "short": "Cleveland", "rank": 35, "rent": 1394, "rent_yoy": 4.7, "rent_3yr": 18.2, "rent_5yr": 38.1, "rent_slope": 1.8, "home_value": 239419, "hv_yoy": 4.3, "hv_3yr": 18.9, "hv_5yr": 38.9, "ptr": 14.3, "income": 62624, "ri_ratio": 3.74, "stay_score": 5.2, "leave_urgency": 4.8, "afford_score": 9.0, "momentum_score": 1.4, "occupations": {"Software Developer": {"wage": 102000, "pp": 6.1}, "Registered Nurse": {"wage": 68000, "pp": 4.07}, "Teacher (K-12)": {"wage": 56000, "pp": 3.35}, "Financial Analyst": {"wage": 76000, "pp": 4.54}, "Marketing Manager": {"wage": 92000, "pp": 5.5}, "Electrician": {"wage": 65000, "pp": 3.89}}, "rent_ts": [["2018", 877], ["2019", 917], ["2020", 968], ["2021", 1046], ["2022", 1141], ["2023", 1204], ["2024", 1286], ["2025", 1356], ["2026", 1389]], "hv_ts": [["2018", 142332], ["2019", 150055], ["2020", 158192], ["2021", 180116], ["2022", 197836], ["2023", 207209], ["2024", 221489], ["2025", 232841], ["2026", 238960]]}], "occupations": ["Software Developer", "Registered Nurse", "Teacher (K-12)", "Financial Analyst", "Marketing Manager", "Electrician"]};
+
+const TT = { backgroundColor:'#1c2128', borderColor:'#30363d', textStyle:{color:'#e6edf3',fontSize:12} };
+
+// signal colors
+const LEAVE_CLR = '#f85149';
+const WATCH_CLR = '#f0883e';
+const STAY_CLR  = '#3fb950';
+const NEUT_CLR  = '#388bfd';
+
+function signal(urgency) {
+  if (urgency >= 6)   return { label:'LEAVE',  cls:'signal-leave',  clr:LEAVE_CLR };
+  if (urgency >= 4.5) return { label:'WATCH',  cls:'signal-watch',  clr:WATCH_CLR };
+  if (urgency >= 3)   return { label:'NEUTRAL', cls:'signal-neutral', clr:NEUT_CLR  };
+  return               { label:'STAY',   cls:'signal-stay',  clr:STAY_CLR  };
+}
+
+// chart instances
+let rentChart = null, hvChart = null, ppChart = null, scatterChart = null;
+let selectedMetro = D.metros[0].name;
+
+function getOcc() { return document.getElementById('occSelect').value; }
+function getSort(){ return document.getElementById('sortSelect').value; }
+
+function getSortedMetros() {
+  const occ = getOcc();
+  const sort = getSort();
+  return [...D.metros].sort((a,b) => {
+    if (sort === 'leave_urgency') return b.leave_urgency - a.leave_urgency;
+    if (sort === 'pp') {
+      const pa = a.occupations[occ]?.pp || 0;
+      const pb = b.occupations[occ]?.pp || 0;
+      return pb - pa;
+    }
+    if (sort === 'rent') return b.rent - a.rent;
+    if (sort === 'hv_5yr') return b.hv_5yr - a.hv_5yr;
+    return a.rank - b.rank;
+  });
+}
+
+function renderCityList() {
+  const occ = getOcc();
+  const metros = getSortedMetros();
+  const list = document.getElementById('cityList');
+  list.innerHTML = metros.map(m => {
+    const sig = signal(m.leave_urgency);
+    const pp = m.occupations[occ]?.pp;
+    const ppStr = pp ? `${pp.toFixed(1)}x` : '—';
+    return `<div class="city-row ${m.name===selectedMetro?'active':''}" onclick="selectCity('${m.name}')">
+      <span class="cr-rank">${m.rank}</span>
+      <span class="city-name">${m.short}</span>
+      <span class="cr-rent" style="font-size:0.68rem;color:#6e7681">$${m.rent.toLocaleString()}</span>
+      <span style="font-size:0.68rem;color:${sig.clr};font-weight:700;width:52px;text-align:right">${sig.label}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderStatCards() {
+  const occ = getOcc();
+  const m = D.metros.find(x => x.name === selectedMetro);
+  if (!m) return;
+  const sig = signal(m.leave_urgency);
+  const occData = m.occupations[occ];
+  const wage = occData?.wage;
+  const pp = occData?.pp;
+  const ppColor = pp >= 4 ? STAY_CLR : pp >= 3 ? NEUT_CLR : pp >= 2 ? WATCH_CLR : LEAVE_CLR;
+
+  document.getElementById('statCards').innerHTML = `
+    <div class="stat-card" style="border-top:2px solid ${sig.clr}">
+      <div class="sc-eye">Leave Urgency</div>
+      <div class="sc-val" style="color:${sig.clr}">${m.leave_urgency}/10</div>
+      <div class="sc-sub"><span class="signal ${sig.cls}">${sig.label}</span></div>
+    </div>
+    <div class="stat-card" style="border-top:2px solid ${ppColor}">
+      <div class="sc-eye">Purchasing Power · ${occ}</div>
+      <div class="sc-val" style="color:${ppColor}">${pp ? pp.toFixed(1)+'x' : '—'}</div>
+      <div class="sc-sub">${wage ? '$'+wage.toLocaleString()+'/yr wage' : 'No data'} · $${m.rent.toLocaleString()}/mo rent</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-eye">Rent Trend</div>
+      <div class="sc-val" style="color:${m.rent_yoy>3?LEAVE_CLR:m.rent_yoy>0?WATCH_CLR:STAY_CLR}">${m.rent_yoy>0?'+':''}${m.rent_yoy}%</div>
+      <div class="sc-sub">YoY · ${m.rent_3yr>0?'+':''}${m.rent_3yr}% over 3 yrs · ${m.rent_slope>0?'+':''}${m.rent_slope}% last 6mo</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-eye">Home Values</div>
+      <div class="sc-val" style="color:#e6edf3">${m.home_value ? '$'+Math.round(m.home_value/1000)+'K' : '—'}</div>
+      <div class="sc-sub">${m.hv_yoy>0?'+':''}${m.hv_yoy}% YoY · ${m.hv_5yr>0?'+':''}${m.hv_5yr}% over 5 yrs</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-eye">Median HH Income</div>
+      <div class="sc-val" style="color:#e6edf3">$${Math.round(m.income/1000)}K</div>
+      <div class="sc-sub">Rent-to-income: ${m.ri_ratio.toFixed(1)}x annual rent</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-eye">Price-to-Rent Ratio</div>
+      <div class="sc-val" style="color:${m.ptr>25?LEAVE_CLR:m.ptr>20?WATCH_CLR:STAY_CLR}">${m.ptr || '—'}</div>
+      <div class="sc-sub">>25 = strongly renter-favored · <15 = consider buying</div>
+    </div>`;
+}
+
+function renderTrendCharts() {
+  const m = D.metros.find(x => x.name === selectedMetro);
+  if (!m) return;
+
+  // Rent trend
+  if (rentChart) rentChart.dispose();
+  rentChart = echarts.init(document.getElementById('rentTrendChart'), 'dark');
+  rentChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{trigger:'axis',...TT,formatter:p=>`${p[0].axisValue}: <strong>$${p[0].value.toLocaleString()}/mo</strong>`},
+    grid:{top:12,right:12,bottom:32,left:52},
+    xAxis:{type:'category',data:m.rent_ts.map(p=>p[0]),axisLabel:{color:'#6e7681',fontSize:9},axisLine:{lineStyle:{color:'#21262d'}},axisTick:{show:false}},
+    yAxis:{type:'value',axisLabel:{color:'#6e7681',fontSize:9,formatter:v=>'$'+v.toLocaleString()},splitLine:{lineStyle:{color:'#21262d'}},axisLine:{show:false}},
+    series:[{
+      type:'line',data:m.rent_ts.map(p=>p[1]),smooth:true,symbol:'none',
+      lineStyle:{color:'#388bfd',width:2.5},
+      areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,
+        colorStops:[{offset:0,color:'rgba(56,139,253,0.18)'},{offset:1,color:'rgba(56,139,253,0)'}]}}
+    }]
+  });
+
+  // Home value trend
+  if (hvChart) hvChart.dispose();
+  hvChart = echarts.init(document.getElementById('hvTrendChart'), 'dark');
+  hvChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{trigger:'axis',...TT,formatter:p=>`${p[0].axisValue}: <strong>$${p[0].value.toLocaleString()}</strong>`},
+    grid:{top:12,right:12,bottom:32,left:64},
+    xAxis:{type:'category',data:m.hv_ts.map(p=>p[0]),axisLabel:{color:'#6e7681',fontSize:9},axisLine:{lineStyle:{color:'#21262d'}},axisTick:{show:false}},
+    yAxis:{type:'value',axisLabel:{color:'#6e7681',fontSize:9,formatter:v=>'$'+Math.round(v/1000)+'K'},splitLine:{lineStyle:{color:'#21262d'}},axisLine:{show:false}},
+    series:[{
+      type:'line',data:m.hv_ts.map(p=>p[1]),smooth:true,symbol:'none',
+      lineStyle:{color:'#f0883e',width:2.5},
+      areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,
+        colorStops:[{offset:0,color:'rgba(240,136,62,0.15)'},{offset:1,color:'rgba(240,136,62,0)'}]}}
+    }]
+  });
+}
+
+function renderPPChart() {
+  const occ = getOcc();
+  document.getElementById('ppChartTitle').textContent = occ + ' — Wage ÷ Annual Rent by Metro';
+
+  const sorted = [...D.metros]
+    .filter(m => m.occupations[occ])
+    .sort((a,b) => a.occupations[occ].pp - b.occupations[occ].pp);
+
+  if (ppChart) ppChart.dispose();
+  ppChart = echarts.init(document.getElementById('ppChart'), 'dark');
+  ppChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{trigger:'axis',...TT,formatter:p=>{
+      const m = D.metros.find(x=>x.short===p[0].name);
+      const od = m?.occupations[occ];
+      return `<strong>${p[0].name}</strong><br/>Purchasing power: <strong>${p[0].value}x</strong><br/>Wage: $${od?.wage.toLocaleString()}/yr<br/>Rent: $${m?.rent.toLocaleString()}/mo`;
+    }},
+    grid:{top:12,right:24,bottom:16,left:100},
+    xAxis:{type:'value',axisLabel:{color:'#6e7681',fontSize:10,formatter:v=>v+'x'},splitLine:{lineStyle:{color:'#21262d'}},axisLine:{show:false}},
+    yAxis:{type:'category',data:sorted.map(m=>m.short),axisLabel:{color:'#c9d1d9',fontSize:10},axisLine:{show:false},axisTick:{show:false}},
+    series:[{
+      type:'bar',barMaxWidth:18,
+      data:sorted.map(m=>{
+        const pp = m.occupations[occ].pp;
+        const sig = signal(m.leave_urgency);
+        const isSelected = m.name === selectedMetro;
+        return {
+          value: pp,
+          itemStyle:{
+            color: isSelected ? '#e6edf3' : (pp >= 5 ? STAY_CLR : pp >= 3.5 ? NEUT_CLR : pp >= 2.5 ? WATCH_CLR : LEAVE_CLR),
+            borderRadius:[0,3,3,0],
+            opacity: isSelected ? 1 : 0.75
+          }
+        };
+      }),
+      label:{show:true,position:'right',color:'#6e7681',fontSize:9,formatter:p=>p.value.toFixed(1)+'x'}
+    }]
+  });
+}
+
+function renderScatter() {
+  const occ = getOcc();
+  document.getElementById('scatterTitle').textContent = 'Leave Urgency vs. Purchasing Power — ' + occ;
+
+  if (scatterChart) scatterChart.dispose();
+  scatterChart = echarts.init(document.getElementById('urgencyScatter'), 'dark');
+
+  const data = D.metros
+    .filter(m => m.occupations[occ])
+    .map(m => {
+      const od = m.occupations[occ];
+      const sig = signal(m.leave_urgency);
+      return {
+        value: [od.pp, m.leave_urgency],
+        name: m.short,
+        metro: m,
+        occ: od,
+        symbolSize: Math.sqrt(m.rent) * 1.8,
+        itemStyle: { color: sig.clr, opacity: 0.8, borderColor:'rgba(255,255,255,0.15)', borderWidth:1.5 },
+        label: { show:true, formatter:m.short, position:'right', color:'#e6edf3', fontSize:10, fontWeight:600,
+          textBorderColor:'#0d1117', textBorderWidth:2 }
+      };
+    });
+
+  scatterChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{...TT,formatter:p=>{
+      const m = p.data.metro;
+      const od = p.data.occ;
+      const sig = signal(m.leave_urgency);
+      return `<strong style="font-size:13px">${m.name}</strong><br/>
+        <span class="signal" style="color:${sig.clr};font-weight:700">${sig.label}</span><br/>
+        Purchasing power: <strong>${od.pp.toFixed(2)}x</strong><br/>
+        Wage: <strong>$${od.wage.toLocaleString()}/yr</strong><br/>
+        Rent: <strong>$${m.rent.toLocaleString()}/mo</strong><br/>
+        Leave urgency: <strong>${m.leave_urgency}/10</strong><br/>
+        Rent 3yr: <strong>${m.rent_3yr>0?'+':''}${m.rent_3yr}%</strong>`;
+    }},
+    grid:{top:40,right:40,bottom:60,left:60},
+    xAxis:{
+      type:'value',name:'Purchasing Power (Wage ÷ Annual Rent)',nameLocation:'middle',nameGap:40,
+      nameTextStyle:{color:'#6e7681',fontSize:11},
+      axisLabel:{color:'#6e7681',fontSize:10,formatter:v=>v+'x'},
+      splitLine:{lineStyle:{color:'#21262d'}},axisLine:{lineStyle:{color:'#30363d'}}
+    },
+    yAxis:{
+      type:'value',name:'Leave Urgency',nameLocation:'middle',nameGap:40,
+      nameTextStyle:{color:'#6e7681',fontSize:11},
+      axisLabel:{color:'#6e7681',fontSize:10,formatter:v=>v+'/10'},
+      splitLine:{lineStyle:{color:'#21262d'}},axisLine:{show:false},
+      min:0,max:10
+    },
+    // Quadrant lines
+    series:[
+      // H-line at 4.5 (watch threshold)
+      {type:'line',data:[],silent:true,animation:false,
+        markLine:{silent:true,symbol:'none',
+          lineStyle:{color:'#30363d',type:'dashed',width:1},
+          label:{formatter:'WATCH →',color:'#484f58',fontSize:9},
+          data:[{yAxis:4.5}]}},
+      // V-line at 3.0 (affordable threshold)
+      {type:'line',data:[],silent:true,animation:false,
+        markLine:{silent:true,symbol:'none',
+          lineStyle:{color:'#30363d',type:'dashed',width:1},
+          label:{formatter:'3x',color:'#484f58',fontSize:9},
+          data:[{xAxis:3.0}]}},
+      // Scatter
+      {type:'scatter',data,emphasis:{itemStyle:{opacity:1,borderWidth:2}},labelLayout:{hideOverlap:true}}
+    ],
+    graphic:[
+      {type:'text',left:10,top:10,style:{text:'← High urgency, low PP: leave signal',fill:'rgba(248,81,73,0.6)',fontSize:10}},
+      {type:'text',right:10,bottom:40,style:{text:'Low urgency, high PP: stay signal →',fill:'rgba(63,185,80,0.6)',fontSize:10}}
+    ]
+  });
+}
+
+function selectCity(name) {
+  selectedMetro = name;
+  renderCityList();
+  renderStatCards();
+  renderTrendCharts();
+  renderPPChart();
+  renderScatter();
+}
+
+function update() {
+  renderCityList();
+  renderStatCards();
+  renderTrendCharts();
+  renderPPChart();
+  renderScatter();
+}
+
+// Init
+window.addEventListener('load', () => {
+  selectedMetro = D.metros[0].name;
+  update();
+});
+
+window.addEventListener('resize', () => {
+  if(rentChart) rentChart.resize();
+  if(hvChart) hvChart.resize();
+  if(ppChart) ppChart.resize();
+  if(scatterChart) scatterChart.resize();
+});
+</script>
+</body>
+</html>
