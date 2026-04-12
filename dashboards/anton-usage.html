@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anton — Usage Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; }
+  h1 { font-size: 22px; font-weight: 600; color: #e6edf3; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #8b949e; margin-bottom: 24px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+  .kpi { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 18px 16px; }
+  .kpi .label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .kpi .value { font-size: 36px; font-weight: 700; color: #e6edf3; line-height: 1; }
+  .kpi .value span { font-size: 16px; font-weight: 400; color: #8b949e; }
+  .kpi .sub { font-size: 11px; color: #8b949e; margin-top: 6px; }
+  .kpi .sub.up { color: #3fb950; }
+  .kpi .sub.warn { color: #d29922; }
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .charts-grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 18px; margin-bottom: 24px; }
+  .card h2 { font-size: 13px; font-weight: 600; color: #8b949e; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
+  .chart { width: 100%; height: 240px; }
+  .chart-tall { width: 100%; height: 300px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th { color: #8b949e; font-weight: 500; text-align: left; padding: 6px 10px; border-bottom: 1px solid #30363d; font-size: 11px; text-transform: uppercase; }
+  tbody td { padding: 8px 10px; border-bottom: 1px solid #21262d; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #1c2128; }
+  .funnel-row { display: flex; gap: 0; margin-bottom: 16px; }
+  .funnel-step { flex: 1; text-align: center; padding: 16px 8px; background: #161b22; border: 1px solid #30363d; }
+  .funnel-step:first-child { border-radius: 8px 0 0 8px; }
+  .funnel-step:last-child { border-radius: 0 8px 8px 0; }
+  .funnel-step .fval { font-size: 28px; font-weight: 700; color: #e6edf3; }
+  .funnel-step .flabel { font-size: 11px; color: #8b949e; margin-top: 4px; }
+  .funnel-step .fsub { font-size: 11px; color: #3fb950; margin-top: 2px; }
+  .day-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 0; }
+  .day-card { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px; }
+  .day-header { margin-bottom: 10px; }
+  .day-title { font-size: 11px; font-weight: 600; color: #8b949e; text-transform: uppercase; letter-spacing: .4px; }
+  .day-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .day-stat { display: flex; flex-direction: column; }
+  .day-stat .big { font-size: 20px; font-weight: 700; color: #e6edf3; line-height: 1; }
+  .day-stat .small { font-size: 10px; color: #8b949e; margin-top: 2px; }
+  .footer { text-align: center; font-size: 11px; color: #484f58; margin-top: 8px; padding-bottom: 16px; }
+  .note { font-size: 11px; color: #8b949e; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 14px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<h1>⚡ Anton — Usage Dashboard</h1>
+<div class="subtitle">Apr 1–11, 2026 &nbsp;·&nbsp; External users only &nbsp;·&nbsp; 30 countries with active queries &nbsp;·&nbsp; Updated 2026-04-11 11:30 UTC</div>
+
+<div class="note">
+  <strong>Methodology:</strong> "Answer rate" = users who queried (<code>anton_first_query</code>) and received a response (<code>anton_first_answer</code>) ÷ users who queried.
+  <code>anton_started</code> fires on every app reload and is excluded from the denominator. Users identified by IP address; emails not currently captured by Anton.
+</div>
+
+<!-- KPI Row -->
+<div class="kpi-grid">
+  <div class="kpi">
+    <div class="label">Unique Users</div>
+    <div class="value">484</div>
+    <div class="sub up">Unique external IPs since Apr 1</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Queried</div>
+    <div class="value">272</div>
+    <div class="sub">Sent ≥1 question (56% of arrivals)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total Queries</div>
+    <div class="value">2,908</div>
+    <div class="sub">638 sessions &nbsp;·&nbsp; 10.7 avg/user</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Overall Ans Rate</div>
+    <div class="value">99<span>%</span></div>
+    <div class="sub up">Of users who queried</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Median TTFA</div>
+    <div class="value">24<span>s</span></div>
+    <div class="sub">P75: 79s &nbsp;·&nbsp; n=208</div>
+  </div>
+</div>
+
+<!-- Funnel -->
+<div class="funnel-row">
+  <div class="funnel-step">
+    <div class="fval">484</div>
+    <div class="flabel">Arrived</div>
+    <div class="fsub">unique external IPs</div>
+  </div>
+  <div class="funnel-step">
+    <div class="fval">272</div>
+    <div class="flabel">Queried</div>
+    <div class="fsub">56% of arrivals</div>
+  </div>
+  <div class="funnel-step">
+    <div class="fval">268</div>
+    <div class="flabel">Answered</div>
+    <div class="fsub">99% of queriers</div>
+  </div>
+  <div class="funnel-step">
+    <div class="fval">30</div>
+    <div class="flabel">Countries</div>
+    <div class="fsub">with active queries</div>
+  </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="charts-grid" style="margin-top:24px">
+  <div class="card" style="margin-bottom:0">
+    <h2>Daily — Arrived vs Queried vs Total Queries</h2>
+    <div id="dauChart" class="chart-tall"></div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <h2>Engagement Depth — Median Queries/User by Day</h2>
+    <div id="depthChart" class="chart-tall"></div>
+  </div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="charts-grid" style="margin-top:16px">
+  <div class="card" style="margin-bottom:0">
+    <h2>Session Depth Distribution (n=638 sessions)</h2>
+    <div id="sdChart" class="chart"></div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <h2>Queries by Country (Top 10)</h2>
+    <table>
+      <thead><tr><th>Country</th><th>Users</th><th>Queries</th></tr></thead>
+      <tbody>
+    <tr>
+      <td>🇺🇸 United States</td>
+      <td style="color:#e6edf3;font-weight:600">130</td>
+      <td style="color:#e6edf3;font-weight:600">994</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 India</td>
+      <td style="color:#e6edf3;font-weight:600">102</td>
+      <td style="color:#e6edf3;font-weight:600">419</td>
+    </tr>
+    <tr>
+      <td>🇳🇴 Norway</td>
+      <td style="color:#e6edf3;font-weight:600">3</td>
+      <td style="color:#e6edf3;font-weight:600">275</td>
+    </tr>
+    <tr>
+      <td>🇲🇽 Mexico</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#e6edf3;font-weight:600">105</td>
+    </tr>
+    <tr>
+      <td>🇱🇹 Lithuania</td>
+      <td style="color:#e6edf3;font-weight:600">1</td>
+      <td style="color:#e6edf3;font-weight:600">93</td>
+    </tr>
+    <tr>
+      <td>🇲🇰 North Macedonia</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#e6edf3;font-weight:600">93</td>
+    </tr>
+    <tr>
+      <td>🇬🇧 United Kingdom</td>
+      <td style="color:#e6edf3;font-weight:600">32</td>
+      <td style="color:#e6edf3;font-weight:600">92</td>
+    </tr>
+    <tr>
+      <td>🇧🇷 Brazil</td>
+      <td style="color:#e6edf3;font-weight:600">17</td>
+      <td style="color:#e6edf3;font-weight:600">86</td>
+    </tr>
+    <tr>
+      <td>🇨🇦 Canada</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#e6edf3;font-weight:600">81</td>
+    </tr>
+    <tr>
+      <td>🇻🇳 Vietnam</td>
+      <td style="color:#e6edf3;font-weight:600">8</td>
+      <td style="color:#e6edf3;font-weight:600">62</td>
+    </tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Day by day -->
+<div class="card" style="margin-top:16px">
+  <h2>Day by Day</h2>
+  <div class="day-grid">
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 1 — Launch Day</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">18</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">14</span><span class="small">queried (78%)</span></div>
+      <div class="day-stat"><span class="big">100%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">8.5</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 2 — Day 2</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">41</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">27</span><span class="small">queried (66%)</span></div>
+      <div class="day-stat"><span class="big">100%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">9</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 3 — Day 3</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">29</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">21</span><span class="small">queried (72%)</span></div>
+      <div class="day-stat"><span class="big">76%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">5</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 4 — Day 4</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">32</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">18</span><span class="small">queried (56%)</span></div>
+      <div class="day-stat"><span class="big">94%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">3.0</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 5 — Day 5</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">40</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">20</span><span class="small">queried (50%)</span></div>
+      <div class="day-stat"><span class="big">100%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">3.5</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 6 — Day 6</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">70</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">51</span><span class="small">queried (73%)</span></div>
+      <div class="day-stat"><span class="big">92%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">5</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 7 — Day 7</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">104</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">72</span><span class="small">queried (69%)</span></div>
+      <div class="day-stat"><span class="big">93%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">4.0</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 8 — Day 8</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">94</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">71</span><span class="small">queried (76%)</span></div>
+      <div class="day-stat"><span class="big">89%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">4</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 9 — Day 9</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">64</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">46</span><span class="small">queried (72%)</span></div>
+      <div class="day-stat"><span class="big">80%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">2</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 10 — Day 10</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">45</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">36</span><span class="small">queried (80%)</span></div>
+      <div class="day-stat"><span class="big">89%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">0</span><span class="small">median Q</span></div>
+    </div>
+  </div>
+  <div class="day-card">
+    <div class="day-header">
+      <span class="day-title">APR 11 — Day 11 (Today)</span>
+    </div>
+    <div class="day-stats">
+      <div class="day-stat"><span class="big">11</span><span class="small">arrived</span></div>
+      <div class="day-stat"><span class="big">13</span><span class="small">queried (118%)</span></div>
+      <div class="day-stat"><span class="big">69%</span><span class="small">ans rate</span></div>
+      <div class="day-stat"><span class="big">0</span><span class="small">median Q</span></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- User table -->
+<div class="card">
+  <h2>All External Users — Apr 1 to Now (484 total, showing top 80 by query volume)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>User / Location</th>
+        <th>First Seen</th>
+        <th>Queries</th>
+        <th>Days Active</th>
+        <th>Ans Rate</th>
+        <th>Sig</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>🇳🇴 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Kristiansand, Norway</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">263</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">14%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Columbia Electric</span><br><span style="color:#484f58;font-size:10px">Napa, United States</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">118</td>
+      <td style="color:#8b949e">10d</td>
+      <td style="color:#8b949e">94%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Petco Animal Supplies</span><br><span style="color:#484f58;font-size:10px">Vallejo, United States</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">103</td>
+      <td style="color:#8b949e">9d</td>
+      <td style="color:#8b949e">82%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇱🇹 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Vilnius, Lithuania</span></td>
+      <td style="color:#8b949e">Apr 4</td>
+      <td style="color:#e6edf3;font-weight:600">93</td>
+      <td style="color:#8b949e">6d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">San Francisco, United States</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">68</td>
+      <td style="color:#8b949e">8d</td>
+      <td style="color:#8b949e">93%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇨🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Qingdao, China</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">60</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">San Francisco, United States</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">57</td>
+      <td style="color:#8b949e">7d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇲🇰 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Bitola, North Macedonia</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">54</td>
+      <td style="color:#8b949e">8d</td>
+      <td style="color:#8b949e">98%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇲🇽 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Farmers Insurance</span><br><span style="color:#484f58;font-size:10px">Benito Juarez, Mexico</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">54</td>
+      <td style="color:#8b949e">4d</td>
+      <td style="color:#8b949e">67%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇬🇧 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Sunderland, United Kingdom</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">51</td>
+      <td style="color:#8b949e">9d</td>
+      <td style="color:#8b949e">60%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇧🇷 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Jaguariúna, Brazil</span></td>
+      <td style="color:#8b949e">Apr 10</td>
+      <td style="color:#e6edf3;font-weight:600">50</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">91%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> ADP</span><br><span style="color:#484f58;font-size:10px">Succasunna, United States</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">49</td>
+      <td style="color:#8b949e">6d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Ranchi, India</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">48</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Mount Holyoke College</span><br><span style="color:#484f58;font-size:10px">Alexandria, United States</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">45</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px"></span></td>
+      <td style="color:#8b949e">—</td>
+      <td style="color:#e6edf3;font-weight:600">42</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">—</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇨🇦 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> AW4U Real Estate Group</span><br><span style="color:#484f58;font-size:10px">Tecumseh, Canada</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">37</td>
+      <td style="color:#8b949e">8d</td>
+      <td style="color:#8b949e">94%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇻🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Hanoi, Vietnam</span></td>
+      <td style="color:#8b949e">Apr 3</td>
+      <td style="color:#e6edf3;font-weight:600">37</td>
+      <td style="color:#8b949e">5d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Coimbatore, India</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">35</td>
+      <td style="color:#8b949e">5d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> American Airlines</span><br><span style="color:#484f58;font-size:10px">Dallas, United States</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">34</td>
+      <td style="color:#8b949e">4d</td>
+      <td style="color:#8b949e">75%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Pune, India</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">34</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Medellín, Colombia</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">31</td>
+      <td style="color:#8b949e">4d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Santa Barbara, United States</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">30</td>
+      <td style="color:#8b949e">7d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇩🇪 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Rostock, Germany</span></td>
+      <td style="color:#8b949e">Apr 10</td>
+      <td style="color:#e6edf3;font-weight:600">30</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇯🇵 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Shizuoka, Japan</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">30</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> ImpactLife</span><br><span style="color:#484f58;font-size:10px">Palo Alto, United States</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">30</td>
+      <td style="color:#8b949e">4d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Mumbai, India</span></td>
+      <td style="color:#8b949e">Apr 9</td>
+      <td style="color:#e6edf3;font-weight:600">28</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">80%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇲🇽 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Metepec, Mexico</span></td>
+      <td style="color:#8b949e">Apr 11</td>
+      <td style="color:#e6edf3;font-weight:600">27</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Nashville Symphony</span><br><span style="color:#484f58;font-size:10px">Delafield, United States</span></td>
+      <td style="color:#8b949e">Apr 9</td>
+      <td style="color:#e6edf3;font-weight:600">27</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> IBM</span><br><span style="color:#484f58;font-size:10px">Bengaluru, India</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">24</td>
+      <td style="color:#8b949e">4d</td>
+      <td style="color:#8b949e">75%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Pixel Consultancy</span><br><span style="color:#484f58;font-size:10px">Kolkata, India</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">22</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">80%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> BrandMuscle</span><br><span style="color:#484f58;font-size:10px">Norwalk, United States</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">21</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">83%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇸🇰 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Bratislava, Slovakia</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">21</td>
+      <td style="color:#8b949e">9d</td>
+      <td style="color:#8b949e">92%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">East Orange, United States</span></td>
+      <td style="color:#8b949e">Apr 5</td>
+      <td style="color:#e6edf3;font-weight:600">20</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">🔥</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> All Energy Solar</span><br><span style="color:#484f58;font-size:10px">Chaska, United States</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">19</td>
+      <td style="color:#8b949e">9d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Etched</span><br><span style="color:#484f58;font-size:10px">Fremont, United States</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">19</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Brooklyn, United States</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">18</td>
+      <td style="color:#8b949e">5d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇦🇹 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> MARK Metallwarenfabrik</span><br><span style="color:#484f58;font-size:10px">Windischgarsten, Austria</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">18</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">88%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Newgen</span><br><span style="color:#484f58;font-size:10px">Ranchi, India</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">17</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Tunis, Tunisia</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">17</td>
+      <td style="color:#8b949e">3d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Decision Tree Media</span><br><span style="color:#484f58;font-size:10px">Gurugram, India</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">17</td>
+      <td style="color:#8b949e">3d</td>
+      <td style="color:#8b949e">50%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇳🇦 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Ncrst</span><br><span style="color:#484f58;font-size:10px">Tsumeb, Namibia</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">17</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Niv's Bling</span><br><span style="color:#484f58;font-size:10px">Fremont, United States</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">16</td>
+      <td style="color:#8b949e">3d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇿🇦 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Cape Town, South Africa</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">15</td>
+      <td style="color:#8b949e">10d</td>
+      <td style="color:#8b949e">67%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇨🇦 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Triple Random</span><br><span style="color:#484f58;font-size:10px">Olds, Canada</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">14</td>
+      <td style="color:#8b949e">8d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Chicago, United States</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">14</td>
+      <td style="color:#8b949e">6d</td>
+      <td style="color:#8b949e">91%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px"></span></td>
+      <td style="color:#8b949e">—</td>
+      <td style="color:#e6edf3;font-weight:600">14</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">—</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px"></span></td>
+      <td style="color:#8b949e">—</td>
+      <td style="color:#e6edf3;font-weight:600">14</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">—</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇲🇰 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Ohrid, North Macedonia</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">13</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">80%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Benalmádena, Spain</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">13</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇬🇧 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Savills</span><br><span style="color:#484f58;font-size:10px">United Kingdom</span></td>
+      <td style="color:#8b949e">Apr 10</td>
+      <td style="color:#e6edf3;font-weight:600">13</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇧🇷 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Joinville, Brazil</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">13</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Stanford University</span><br><span style="color:#484f58;font-size:10px">Stanford, United States</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">13</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px"></span></td>
+      <td style="color:#8b949e">—</td>
+      <td style="color:#e6edf3;font-weight:600">12</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">—</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇵🇰 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Lahore, Pakistan</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">12</td>
+      <td style="color:#8b949e">3d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Chillán, Chile</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">12</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px"></span></td>
+      <td style="color:#8b949e">—</td>
+      <td style="color:#e6edf3;font-weight:600">12</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">—</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇳🇴 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> General Beverage</span><br><span style="color:#484f58;font-size:10px">Oslo, Norway</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">12</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">—</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Ranchi, India</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇵🇰 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Lahore, Pakistan</span></td>
+      <td style="color:#8b949e">Apr 5</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇻🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Ho Chi Minh City, Vietnam</span></td>
+      <td style="color:#8b949e">Apr 4</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇲🇰 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Ohrid, North Macedonia</span></td>
+      <td style="color:#8b949e">Apr 2</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇲🇽 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Nuevo Laredo, Mexico</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Tel Aviv, Israel</span></td>
+      <td style="color:#8b949e">Apr 10</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> CU Denver</span><br><span style="color:#484f58;font-size:10px">Denver, United States</span></td>
+      <td style="color:#8b949e">Apr 3</td>
+      <td style="color:#e6edf3;font-weight:600">11</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇩 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Surabaya, Indonesia</span></td>
+      <td style="color:#8b949e">Apr 3</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇯🇵 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Musashino, Japan</span></td>
+      <td style="color:#8b949e">Apr 3</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Ranchi, India</span></td>
+      <td style="color:#8b949e">Apr 3</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Numerator</span><br><span style="color:#484f58;font-size:10px">Delhi, India</span></td>
+      <td style="color:#8b949e">Apr 5</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px"></span></td>
+      <td style="color:#8b949e">—</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">75%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇨🇦 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> The Sales Factory</span><br><span style="color:#484f58;font-size:10px">Toronto, Canada</span></td>
+      <td style="color:#8b949e">Apr 6</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Decision Tree Media</span><br><span style="color:#484f58;font-size:10px">Chennai, India</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">3d</td>
+      <td style="color:#8b949e">80%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Riyadh, Saudi Arabia</span></td>
+      <td style="color:#8b949e">Apr 5</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Charlotte, United States</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">10</td>
+      <td style="color:#8b949e">2d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇮🇳 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> myHQ</span><br><span style="color:#484f58;font-size:10px">Ranchi, India</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">75%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🌐 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Brno, Czechia</span></td>
+      <td style="color:#8b949e">Apr 4</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇬🇧 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">Islington, United Kingdom</span></td>
+      <td style="color:#8b949e">Apr 8</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> San Francisco Opera</span><br><span style="color:#484f58;font-size:10px">San Diego, United States</span></td>
+      <td style="color:#8b949e">Apr 1</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#8b949e">10d</td>
+      <td style="color:#8b949e">89%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9">Unknown</span><br><span style="color:#484f58;font-size:10px">North Bergen, United States</span></td>
+      <td style="color:#8b949e">Apr 4</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇺🇸 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Synthekine</span><br><span style="color:#484f58;font-size:10px">Redwood City, United States</span></td>
+      <td style="color:#8b949e">Apr 9</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">100%</td>
+      <td style="font-size:14px">✓</td>
+    </tr>
+    <tr>
+      <td>🇿🇦 <span style="color:#c9d1d9"></span><span style="color:#58a6ff;font-size:10px"> Richmond Valley Council</span><br><span style="color:#484f58;font-size:10px">South Africa</span></td>
+      <td style="color:#8b949e">Apr 7</td>
+      <td style="color:#e6edf3;font-weight:600">9</td>
+      <td style="color:#8b949e">1d</td>
+      <td style="color:#8b949e">67%</td>
+      <td style="font-size:14px">✓</td>
+    </tr></tbody>
+  </table>
+</div>
+
+<div class="footer">Anton Usage Dashboard &nbsp;·&nbsp; Auto-generated by Anton &nbsp;·&nbsp; 2026-04-11 11:30 &nbsp;·&nbsp; PostHog</div>
+
+<script>
+const C = { blue:'#58a6ff', green:'#3fb950', orange:'#e3b341', purple:'#bc8cff', red:'#f85149', teal:'#39d353' };
+const grid = { left:48, right:16, top:16, bottom:48 };
+const ax = { axisLine:{lineStyle:{color:'#30363d'}}, splitLine:{lineStyle:{color:'#21262d'}}, axisLabel:{color:'#8b949e',fontSize:11}, axisTick:{show:false} };
+const tip = { trigger:'axis', backgroundColor:'#161b22', borderColor:'#30363d', textStyle:{color:'#c9d1d9'} };
+
+const dau = echarts.init(document.getElementById('dauChart'), 'dark');
+dau.setOption({
+  backgroundColor:'transparent', grid, tooltip:tip,
+  legend:{ data:['Arrived','Queried','Total Queries'], textStyle:{color:'#8b949e',fontSize:11}, bottom:0 },
+  xAxis:{ type:'category', data:["Apr 1", "Apr 2", "Apr 3", "Apr 4", "Apr 5", "Apr 6", "Apr 7", "Apr 8", "Apr 9", "Apr 10", "Apr 11"], ...ax },
+  yAxis:[
+    { type:'value', name:'Users', nameTextStyle:{color:'#8b949e'}, ...ax },
+    { type:'value', name:'Queries', nameTextStyle:{color:'#8b949e'}, ...ax }
+  ],
+  series:[
+    { name:'Arrived',       type:'bar',  data:[18, 41, 29, 32, 40, 70, 104, 94, 64, 45, 11],  itemStyle:{color:C.blue,opacity:0.6}, barMaxWidth:22 },
+    { name:'Queried',       type:'bar',  data:[14, 27, 21, 18, 20, 51, 72, 71, 46, 36, 13],  itemStyle:{color:C.teal,opacity:0.9}, barMaxWidth:22 },
+    { name:'Total Queries', type:'line', data:[194, 320, 171, 118, 154, 311, 692, 460, 202, 177, 109], yAxisIndex:1, itemStyle:{color:C.orange}, lineStyle:{width:2}, symbol:'circle', symbolSize:5 }
+  ]
+});
+
+const dep = echarts.init(document.getElementById('depthChart'), 'dark');
+dep.setOption({
+  backgroundColor:'transparent', grid, tooltip:tip,
+  legend:{ data:['Median Q/user'], textStyle:{color:'#8b949e',fontSize:11}, bottom:0 },
+  xAxis:{ type:'category', data:["Apr 1", "Apr 2", "Apr 3", "Apr 4", "Apr 5", "Apr 6", "Apr 7", "Apr 8", "Apr 9", "Apr 10", "Apr 11"], ...ax },
+  yAxis:{ type:'value', name:'Queries', ...ax },
+  series:[
+    { name:'Median Q/user', type:'bar', data:[8.5, 9, 5, 3.0, 3.5, 5, 4.0, 4, 2, 0, 0], itemStyle:{color:C.purple, opacity:0.85}, barMaxWidth:28,
+      markLine:{ data:[{type:'average',label:{formatter:'avg',color:'#8b949e'}}], lineStyle:{color:'#8b949e',type:'dashed'} } }
+  ]
+});
+
+const dpcts = [34.8, 29.6, 13.3, 14.9, 5.0, 2.4];
+const sd = echarts.init(document.getElementById('sdChart'), 'dark');
+sd.setOption({
+  backgroundColor:'transparent', grid:{left:64,right:16,top:16,bottom:40}, tooltip:tip,
+  xAxis:{ type:'category', data:["1 query", "2\u20133", "4\u20135", "6\u201310", "11\u201320", "21+"], ...ax },
+  yAxis:{ type:'value', name:'Sessions', ...ax },
+  series:[{ type:'bar', data:[222, 189, 85, 95, 32, 15], barMaxWidth:44,
+    itemStyle:{ color:function(p){ return [C.red,C.orange,C.orange,C.blue,C.green,C.purple][p.dataIndex]||C.blue; } },
+    label:{ show:true, position:'top', color:'#8b949e', fontSize:11, formatter:function(p){ return dpcts[p.dataIndex]+'%'; } }
+  }]
+});
+
+window.addEventListener('resize', function(){ dau.resize(); dep.resize(); sd.resize(); });
+</script>
+</body>
+</html>
