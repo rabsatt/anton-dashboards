@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- PostHog Analytics -->
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog&&window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture identify alias reset on onFeatureFlags".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_sgRUJmPkQzQnZip7Z9ihisndP5nQ548WsPGXDUBzDejZ', {
+  api_host: 'https://us.i.posthog.com',
+  person_profiles: 'always'
+});
+</script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>How Old Are My Neighbors?</title>
@@ -335,5 +343,41 @@ function highlightZip(d) {
 
 window.addEventListener('resize', () => chart.resize());
 </script>
+
+<style>
+.vote-bar { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.vote-btn { background: #161b22; border: 1px solid #30363d; border-radius: 50%; width: 48px; height: 48px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .15s, transform .15s; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+.vote-btn:hover { border-color: #58a6ff; transform: scale(1.1); }
+.vote-btn.voted { background: #1f6feb33; border-color: #58a6ff; }
+.vote-count { font-size: 11px; color: #8b949e; font-family: -apple-system, sans-serif; background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 2px 8px; }
+</style>
+<div class="vote-bar">
+  <button class="vote-btn" id="voteBtn" title="Like this dashboard">👍</button>
+  <span class="vote-count" id="voteCount">—</span>
+</div>
+<script>
+(function() {
+  var PAGE = window.location.pathname.split('/').pop().replace('.html','') || 'index';
+  var VOTED_KEY = 'ph_voted_' + PAGE;
+  var COUNT_KEY = 'ph_votes_' + PAGE;
+  var btn = document.getElementById('voteBtn');
+  var countEl = document.getElementById('voteCount');
+  var votes = parseInt(localStorage.getItem(COUNT_KEY) || '0');
+  var hasVoted = localStorage.getItem(VOTED_KEY) === '1';
+  countEl.textContent = votes + (votes === 1 ? ' like' : ' likes');
+  if (hasVoted) btn.classList.add('voted');
+  btn.addEventListener('click', function() {
+    if (hasVoted) return;
+    hasVoted = true;
+    votes += 1;
+    localStorage.setItem(VOTED_KEY, '1');
+    localStorage.setItem(COUNT_KEY, String(votes));
+    btn.classList.add('voted');
+    countEl.textContent = votes + (votes === 1 ? ' like' : ' likes');
+    if (window.posthog) posthog.capture('dashboard_liked', { dashboard: PAGE, url: window.location.href });
+  });
+})();
+</script>
+
 </body>
 </html>
