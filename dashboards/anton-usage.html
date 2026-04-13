@@ -9,292 +9,364 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; }
   h1 { font-size: 22px; font-weight: 600; color: #e6edf3; margin-bottom: 4px; }
-  .subtitle { font-size: 12px; color: #8b949e; margin-bottom: 24px; }
-  .section-title { font-size: 13px; font-weight: 600; color: #8b949e; text-transform: uppercase; letter-spacing: 0.06em; margin: 28px 0 12px; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 16px; }
-  .kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
-  .kpi-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
-  .kpi { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 18px 16px; }
-  .kpi.green { border-color: #238636; }
-  .kpi.amber { border-color: #9e6a03; }
-  .kpi.red { border-color: #8b1a1a; }
-  .kpi.blue { border-color: #1f6feb; }
-  .kpi-label { font-size: 11px; color: #8b949e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .kpi-value { font-size: 26px; font-weight: 700; color: #e6edf3; line-height: 1; }
+  .subtitle { font-size: 12px; color: #8b949e; margin-bottom: 28px; }
+  .section-title { font-size: 11px; font-weight: 700; color: #6e7681; text-transform: uppercase; letter-spacing: 0.08em; margin: 24px 0 10px; }
+  .kpi-row { display: grid; gap: 12px; margin-bottom: 12px; }
+  .cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .kpi { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px 14px; }
+  .kpi.green  { border-color: #238636; }
+  .kpi.amber  { border-color: #9e6a03; }
+  .kpi.blue   { border-color: #1f6feb; }
+  .kpi.red    { border-color: #6e1a1a; }
+  .kpi-label  { font-size: 10px; color: #6e7681; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-value  { font-size: 28px; font-weight: 700; color: #e6edf3; line-height: 1; }
   .kpi-value.green { color: #3fb950; }
   .kpi-value.amber { color: #d29922; }
-  .kpi-value.red { color: #f85149; }
-  .kpi-value.blue { color: #58a6ff; }
-  .kpi-sub { font-size: 11px; color: #8b949e; margin-top: 4px; }
-  .kpi-badge { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-top: 5px; font-weight: 600; }
-  .badge-green { background: #0d3321; color: #3fb950; }
-  .badge-amber { background: #271c00; color: #d29922; }
-  .badge-red { background: #2c1515; color: #f85149; }
-  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-  .chart-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px; }
-  .chart-box h3 { font-size: 12px; font-weight: 600; color: #8b949e; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .chart { height: 220px; }
-  .note { font-size: 10px; color: #6e7681; margin-top: 4px; font-style: italic; }
-  .divider { border: none; border-top: 1px solid #21262d; margin: 20px 0; }
+  .kpi-value.blue  { color: #58a6ff; }
+  .kpi-value.red   { color: #f85149; }
+  .kpi-sub   { font-size: 11px; color: #8b949e; margin-top: 4px; }
+  .kpi-note  { font-size: 10px; color: #6e7681; margin-top: 3px; font-style: italic; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; margin-top: 6px; }
+  .bg-green { background: #0d3321; color: #3fb950; }
+  .bg-amber { background: #271c00; color: #d29922; }
+  .bg-blue  { background: #051d4d; color: #58a6ff; }
+  .bg-red   { background: #2c1212; color: #f85149; }
+  .divider { border: none; border-top: 1px solid #21262d; margin: 22px 0 0; }
+  .charts-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .charts-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .chart-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px 16px; }
+  .chart-box h3 { font-size: 10px; font-weight: 700; color: #6e7681; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .chart { height: 200px; }
 </style>
 </head>
 <body>
-<h1>Anton — Usage Dashboard</h1>
-<div class="subtitle">Week of Apr 7–13, 2026 &nbsp;·&nbsp; Auto-refreshed &nbsp;·&nbsp; External users only</div>
 
-<!-- ── FUNNEL OVERVIEW ── -->
-<div class="section-title">Funnel Overview (All Time)</div>
-<div class="kpi-grid">
+<h1>Anton — Weekly Usage Dashboard</h1>
+<div class="subtitle">Reporting period: Apr 6–12, 2026 &nbsp;·&nbsp; External users only &nbsp;·&nbsp; Source: PostHog</div>
+
+<!-- ══ SECTION 1: ALL-TIME TOTALS ══ -->
+<div class="section-title">All-Time Totals</div>
+<div class="kpi-row cols-5">
+
   <div class="kpi blue">
     <div class="kpi-label">Total Downloads</div>
     <div class="kpi-value blue">451</div>
-    <div class="kpi-sub">Unique anton_started users</div>
-    <div class="note">True install count unavailable via PyPI</div>
+    <div class="kpi-sub">Unique users who ran Anton</div>
+    <div class="kpi-note">True install count N/A via PyPI</div>
   </div>
+
   <div class="kpi">
     <div class="kpi-label">Total Signups</div>
     <div class="kpi-value">68</div>
     <div class="kpi-sub">Subscribed on mdb.ai</div>
+    <div class="kpi-note">Tracking began Apr 6</div>
   </div>
+
   <div class="kpi">
     <div class="kpi-label">BYO-LLM (BYOK)</div>
     <div class="kpi-value amber">~6%</div>
-    <div class="kpi-sub">Rest use mdb.ai keys</div>
-    <div class="note">Low signal — tracking incomplete</div>
+    <div class="kpi-sub">vs 94% mdb.ai keys</div>
+    <div class="kpi-note">Low signal — tracking gap</div>
   </div>
+
   <div class="kpi green">
     <div class="kpi-label">Ever Queried</div>
     <div class="kpi-value green">293</div>
-    <div class="kpi-sub">Users who asked ≥1 question</div>
+    <div class="kpi-sub">Asked ≥1 question all time</div>
   </div>
+
   <div class="kpi">
     <div class="kpi-label">Overall Activation</div>
     <div class="kpi-value">65%</div>
-    <div class="kpi-sub">293 of 451 starters queried</div>
+    <div class="kpi-sub">293 of 451 starters</div>
   </div>
+
 </div>
 
-<hr class="divider">
+<div class="divider"></div>
 
-<!-- ── THIS WEEK: NEW USERS ── -->
-<div class="section-title">New Users — This Week (Apr 7–13)</div>
-<div class="kpi-grid-4">
+<!-- ══ SECTION 2: NEW USERS ══ -->
+<div class="section-title">New Users — Apr 6–12</div>
+<div class="kpi-row cols-4">
+
   <div class="kpi green">
-    <div class="kpi-label">New Users</div>
-    <div class="kpi-value green">259</div>
-    <div class="kpi-sub">First ever anton_started</div>
-    <div class="kpi-badge badge-green">+34.9% vs prior week</div>
+    <div class="kpi-label">New Users This Week</div>
+    <div class="kpi-value green">310</div>
+    <div class="kpi-sub">First ever session</div>
+    <div class="badge bg-green">+127.9% vs prior week (136)</div>
   </div>
+
   <div class="kpi">
-    <div class="kpi-label">Prior Week</div>
-    <div class="kpi-value">192</div>
-    <div class="kpi-sub">Mar 31–Apr 6</div>
+    <div class="kpi-label">Signups This Week</div>
+    <div class="kpi-value">65</div>
+    <div class="kpi-sub">Subscribed on mdb.ai</div>
   </div>
+
   <div class="kpi green">
     <div class="kpi-label">New User Activations</div>
-    <div class="kpi-value green">161</div>
+    <div class="kpi-value green">186</div>
     <div class="kpi-sub">Asked ≥1 question</div>
   </div>
+
   <div class="kpi">
     <div class="kpi-label">New User Activation Rate</div>
-    <div class="kpi-value">62.2%</div>
-    <div class="kpi-sub">161 of 259 new users</div>
-    <div class="kpi-badge badge-green">Strong</div>
+    <div class="kpi-value">60.0%</div>
+    <div class="kpi-sub">186 of 310 new users</div>
+    <div class="badge bg-green">Strong</div>
   </div>
+
 </div>
 
-<hr class="divider">
+<div class="divider"></div>
 
-<!-- ── QUALITY METRICS ── -->
-<div class="section-title">Quality & Speed — This Week</div>
-<div class="kpi-grid">
+<!-- ══ SECTION 3: QUALITY & SPEED ══ -->
+<div class="section-title">Quality &amp; Speed — Apr 6–12</div>
+<div class="kpi-row cols-5">
+
   <div class="kpi green">
     <div class="kpi-label">Answer Reliability</div>
-    <div class="kpi-value green">89.2%</div>
-    <div class="kpi-sub">470 of 527 queries answered</div>
-    <div class="kpi-badge badge-green">↑ Target: 90%</div>
+    <div class="kpi-value green">90.8%</div>
+    <div class="kpi-sub">556 of 612 sessions answered</div>
+    <div class="badge bg-green">Above 90% target</div>
   </div>
+
   <div class="kpi amber">
     <div class="kpi-label">TTFA — From Start</div>
-    <div class="kpi-value amber">6m 57s</div>
-    <div class="kpi-sub">Median · P75: 19m 10s</div>
-    <div class="note">Includes DB connection setup time</div>
+    <div class="kpi-value amber">6m 48s</div>
+    <div class="kpi-sub">Median &nbsp;·&nbsp; P75: 19m 38s</div>
+    <div class="kpi-note">Includes DB connection setup</div>
   </div>
+
   <div class="kpi">
     <div class="kpi-label">TTFA — From Query</div>
-    <div class="kpi-value">41s</div>
-    <div class="kpi-sub">Median · P75: 2m 38s</div>
-    <div class="kpi-badge badge-amber">Pure LLM latency</div>
+    <div class="kpi-value">38s</div>
+    <div class="kpi-sub">Median &nbsp;·&nbsp; P75: 2m 11s</div>
+    <div class="kpi-note">Pure LLM response latency</div>
   </div>
+
   <div class="kpi blue">
-    <div class="kpi-label">Total Sessions</div>
-    <div class="kpi-value blue">527</div>
+    <div class="kpi-label">Sessions (Queries)</div>
+    <div class="kpi-value blue">612</div>
     <div class="kpi-sub">anton_first_query fires</div>
   </div>
+
   <div class="kpi">
-    <div class="kpi-label">Total Answers</div>
-    <div class="kpi-value">470</div>
+    <div class="kpi-label">Answers Returned</div>
+    <div class="kpi-value">556</div>
     <div class="kpi-sub">anton_first_answer fires</div>
   </div>
+
 </div>
 
-<hr class="divider">
+<div class="divider"></div>
 
-<!-- ── ENGAGEMENT ── -->
-<div class="section-title">Engagement — This Week</div>
-<div class="kpi-grid">
+<!-- ══ SECTION 4: ENGAGEMENT ══ -->
+<div class="section-title">Engagement — Apr 6–12</div>
+<div class="kpi-row cols-5">
+
   <div class="kpi">
     <div class="kpi-label">Median Queries / User</div>
     <div class="kpi-value">4</div>
-    <div class="kpi-sub">Avg: 9.0 · P75: 9</div>
+    <div class="kpi-sub">Mean: 9.0 &nbsp;·&nbsp; P75: 9</div>
   </div>
+
   <div class="kpi">
-    <div class="kpi-label">Active Querying Users</div>
-    <div class="kpi-value">210</div>
-    <div class="kpi-sub">Fired ≥1 anton_query</div>
+    <div class="kpi-label">Actively Querying Users</div>
+    <div class="kpi-value">238</div>
+    <div class="kpi-sub">Fired ≥1 query this week</div>
   </div>
+
   <div class="kpi">
-    <div class="kpi-label">% Users Asking a Question</div>
-    <div class="kpi-value">69.2%</div>
-    <div class="kpi-sub">200 of 289 who started</div>
-    <div class="kpi-badge badge-green">Healthy</div>
+    <div class="kpi-label">% Starters Who Asked</div>
+    <div class="kpi-value">68.2%</div>
+    <div class="kpi-sub">230 of 337 who started</div>
+    <div class="badge bg-green">Healthy</div>
   </div>
+
   <div class="kpi green">
     <div class="kpi-label">Active Keys (Last 7d)</div>
-    <div class="kpi-value green">82.6%</div>
-    <div class="kpi-sub">242 of 293 ever-queried users</div>
-    <div class="kpi-badge badge-green">Sticky</div>
+    <div class="kpi-value green">81.2%</div>
+    <div class="kpi-sub">238 of 293 ever-queried users</div>
+    <div class="badge bg-green">Sticky</div>
   </div>
+
   <div class="kpi amber">
     <div class="kpi-label">WoW Retention</div>
-    <div class="kpi-value amber">23.9%</div>
-    <div class="kpi-sub">26 of 109 prior-week users returned</div>
-    <div class="note">Early — base is small</div>
+    <div class="kpi-value amber">30.1%</div>
+    <div class="kpi-sub">22 of 73 prior-week users returned</div>
+    <div class="kpi-note">Early — base still small</div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ CHARTS ══ -->
+<div class="section-title">Visualisations</div>
+
+<div class="charts-2">
+  <div class="chart-box">
+    <h3>Weekly Funnel — Apr 6–12</h3>
+    <div id="c-funnel" class="chart"></div>
+  </div>
+  <div class="chart-box">
+    <h3>BYO-LLM vs mdb.ai Key Preference</h3>
+    <div id="c-byok" class="chart"></div>
   </div>
 </div>
 
-<hr class="divider">
-
-<!-- ── CHARTS ── -->
-<div class="charts-row">
+<div class="charts-3">
   <div class="chart-box">
-    <h3>Funnel — This Week</h3>
-    <div id="chart-funnel" class="chart"></div>
+    <h3>Time to First Answer (seconds)</h3>
+    <div id="c-ttfa" class="chart"></div>
   </div>
   <div class="chart-box">
-    <h3>BYO-LLM vs mdb.ai Keys</h3>
-    <div id="chart-byok" class="chart"></div>
-  </div>
-</div>
-<div class="charts-row">
-  <div class="chart-box">
-    <h3>TTFA Distribution (seconds)</h3>
-    <div id="chart-ttfa" class="chart"></div>
+    <h3>New Users — Week over Week</h3>
+    <div id="c-newusers" class="chart"></div>
   </div>
   <div class="chart-box">
-    <h3>Engagement — Queries per User</h3>
-    <div id="chart-depth" class="chart"></div>
+    <h3>Engagement Distribution</h3>
+    <div id="c-depth" class="chart"></div>
   </div>
 </div>
 
 <script>
-var funnelChart = echarts.init(document.getElementById('chart-funnel'));
-funnelChart.setOption({
+var DARK = '#0d1117', BORDER = '#30363d', LABEL = '#8b949e', TEXT = '#e6edf3';
+
+// ── FUNNEL ──
+var cFunnel = echarts.init(document.getElementById('c-funnel'));
+cFunnel.setOption({
   backgroundColor: 'transparent',
-  tooltip: { trigger: 'item', formatter: '{b}: {c}' },
+  tooltip: { trigger: 'item' },
   series: [{
     type: 'funnel',
-    left: '10%', width: '80%',
-    min: 0, max: 300,
-    data: [
-      { name: 'Started Anton', value: 289 },
-      { name: 'Queried (asked ?)', value: 200 },
-      { name: 'Got Answer', value: 179 }
-    ],
-    label: { show: true, position: 'inside', color: '#e6edf3', fontSize: 12, formatter: '{b}\n{c}' },
+    left: '5%', width: '90%', min: 0, max: 340,
+    gap: 6,
+    label: { show: true, position: 'inside', color: '#fff', fontSize: 11,
+             formatter: function(p) { return p.name + ': ' + p.value; } },
     itemStyle: { borderWidth: 0 },
-    color: ['#1f6feb', '#388bfd', '#3fb950']
+    data: [
+      { name: 'Started Anton',    value: 337, itemStyle: { color: '#1f6feb' } },
+      { name: 'New Signups',      value: 65,  itemStyle: { color: '#388bfd' } },
+      { name: 'Asked a Question', value: 230, itemStyle: { color: '#3fb950' } },
+      { name: 'Got an Answer',    value: 209, itemStyle: { color: '#238636' } }
+    ]
   }]
 });
 
-var byokChart = echarts.init(document.getElementById('chart-byok'));
-byokChart.setOption({
+// ── BYOK PIE ──
+var cByok = echarts.init(document.getElementById('c-byok'));
+cByok.setOption({
   backgroundColor: 'transparent',
   tooltip: { trigger: 'item', formatter: '{b}: {c}%' },
-  legend: { bottom: 10, textStyle: { color: '#8b949e' } },
+  legend: { bottom: 0, textStyle: { color: LABEL } },
   series: [{
-    type: 'pie',
-    radius: ['40%', '70%'],
+    type: 'pie', radius: ['38%', '65%'],
+    label: { color: '#c9d1d9', fontSize: 12, formatter: '{b}\n{c}%' },
     data: [
-      { name: 'mdb.ai Key', value: 94, itemStyle: { color: '#1f6feb' } },
-      { name: 'BYOK (own key)', value: 6, itemStyle: { color: '#3fb950' } }
-    ],
-    label: { show: true, formatter: '{b}\n{c}%', color: '#c9d1d9' }
+      { name: 'mdb.ai Key',  value: 94, itemStyle: { color: '#1f6feb' } },
+      { name: 'BYOK (own)', value: 6,  itemStyle: { color: '#3fb950' } }
+    ]
   }]
 });
 
-var ttfaChart = echarts.init(document.getElementById('chart-ttfa'));
-ttfaChart.setOption({
+// ── TTFA BAR ──
+var cTtfa = echarts.init(document.getElementById('c-ttfa'));
+cTtfa.setOption({
+  backgroundColor: 'transparent',
+  tooltip: { trigger: 'axis', formatter: function(p) {
+    var v = p[0].value;
+    return p[0].name + ': ' + (v >= 60 ? Math.floor(v/60)+'m '+(v%60)+'s' : v+'s');
+  }},
+  xAxis: {
+    type: 'category',
+    data: ['Start→Answer\n(Median)', 'Start→Answer\n(P75)', 'Query→Answer\n(Median)', 'Query→Answer\n(P75)'],
+    axisLabel: { color: LABEL, fontSize: 10 },
+    axisLine: { lineStyle: { color: BORDER } }
+  },
+  yAxis: {
+    type: 'value', name: 'seconds', nameTextStyle: { color: LABEL },
+    axisLabel: { color: LABEL, formatter: '{value}s' },
+    splitLine: { lineStyle: { color: '#21262d' } }
+  },
+  series: [{
+    type: 'bar', barMaxWidth: 52,
+    label: { show: true, position: 'top', color: '#c9d1d9', fontSize: 10,
+             formatter: function(p) {
+               var v = p.value;
+               return v >= 60 ? Math.floor(v/60)+'m\n'+(v%60)+'s' : v+'s';
+             }},
+    data: [
+      { value: 408,  itemStyle: { color: '#d29922', borderRadius: [4,4,0,0] } },
+      { value: 1178, itemStyle: { color: '#9e6a03', borderRadius: [4,4,0,0] } },
+      { value: 38,   itemStyle: { color: '#3fb950', borderRadius: [4,4,0,0] } },
+      { value: 131,  itemStyle: { color: '#238636', borderRadius: [4,4,0,0] } }
+    ]
+  }]
+});
+
+// ── NEW USERS WoW BAR ──
+var cNew = echarts.init(document.getElementById('c-newusers'));
+cNew.setOption({
   backgroundColor: 'transparent',
   tooltip: { trigger: 'axis' },
   xAxis: {
     type: 'category',
-    data: ['From Start', 'P75 Start', 'From Query', 'P75 Query'],
-    axisLabel: { color: '#8b949e', fontSize: 11 },
-    axisLine: { lineStyle: { color: '#30363d' } }
+    data: ['Mar 23–29', 'Mar 30–Apr 5', 'Apr 6–12'],
+    axisLabel: { color: LABEL, fontSize: 10 },
+    axisLine: { lineStyle: { color: BORDER } }
   },
   yAxis: {
-    type: 'value',
-    name: 'seconds',
-    nameTextStyle: { color: '#8b949e' },
-    axisLabel: { color: '#8b949e', formatter: '{value}s' },
+    type: 'value', name: 'New Users', nameTextStyle: { color: LABEL },
+    axisLabel: { color: LABEL },
     splitLine: { lineStyle: { color: '#21262d' } }
   },
   series: [{
-    type: 'bar',
+    type: 'bar', barMaxWidth: 48,
+    label: { show: true, position: 'top', color: '#c9d1d9', fontSize: 12, fontWeight: 600 },
     data: [
-      { value: 417, itemStyle: { color: '#d29922' } },
-      { value: 1150, itemStyle: { color: '#9e6a03' } },
-      { value: 41, itemStyle: { color: '#3fb950' } },
-      { value: 158, itemStyle: { color: '#238636' } }
-    ],
-    barMaxWidth: 60,
-    label: { show: true, position: 'top', color: '#c9d1d9', fontSize: 11, formatter: function(p) {
-      var v = p.value;
-      return v >= 60 ? Math.floor(v/60) + 'm ' + (v%60) + 's' : v + 's';
-    }}
+      { value: 5,   itemStyle: { color: '#30363d', borderRadius: [4,4,0,0] } },
+      { value: 136, itemStyle: { color: '#388bfd', borderRadius: [4,4,0,0] } },
+      { value: 310, itemStyle: { color: '#3fb950', borderRadius: [4,4,0,0] } }
+    ]
   }]
 });
 
-var depthChart = echarts.init(document.getElementById('chart-depth'));
-depthChart.setOption({
+// ── ENGAGEMENT DISTRIBUTION ──
+var cDepth = echarts.init(document.getElementById('c-depth'));
+cDepth.setOption({
   backgroundColor: 'transparent',
   tooltip: { trigger: 'axis' },
   xAxis: {
     type: 'category',
-    data: ['1', '2-3', '4-6', '7-10', '10+'],
-    axisLabel: { color: '#8b949e' },
-    axisLine: { lineStyle: { color: '#30363d' } },
-    name: 'Queries',
-    nameTextStyle: { color: '#8b949e' }
+    data: ['1', '2–3', '4–6', '7–10', '11+'],
+    name: 'Queries this week',
+    nameTextStyle: { color: LABEL, fontSize: 10 },
+    axisLabel: { color: LABEL },
+    axisLine: { lineStyle: { color: BORDER } }
   },
   yAxis: {
-    type: 'value',
-    name: 'Users',
-    nameTextStyle: { color: '#8b949e' },
-    axisLabel: { color: '#8b949e' },
+    type: 'value', name: 'Users', nameTextStyle: { color: LABEL },
+    axisLabel: { color: LABEL },
     splitLine: { lineStyle: { color: '#21262d' } }
   },
   series: [{
-    type: 'bar',
-    data: [52, 48, 55, 35, 20],
-    itemStyle: { color: '#1f6feb', borderRadius: [4,4,0,0] },
-    label: { show: true, position: 'top', color: '#c9d1d9', fontSize: 10 }
+    type: 'bar', barMaxWidth: 44,
+    label: { show: true, position: 'top', color: '#c9d1d9', fontSize: 11 },
+    data: [
+      { value: 58,  itemStyle: { color: '#1f6feb', borderRadius: [4,4,0,0] } },
+      { value: 55,  itemStyle: { color: '#388bfd', borderRadius: [4,4,0,0] } },
+      { value: 62,  itemStyle: { color: '#388bfd', borderRadius: [4,4,0,0] } },
+      { value: 40,  itemStyle: { color: '#58a6ff', borderRadius: [4,4,0,0] } },
+      { value: 23,  itemStyle: { color: '#79c0ff', borderRadius: [4,4,0,0] } }
+    ]
   }]
 });
 
 window.addEventListener('resize', function() {
-  funnelChart.resize(); byokChart.resize(); ttfaChart.resize(); depthChart.resize();
+  cFunnel.resize(); cByok.resize(); cTtfa.resize(); cNew.resize(); cDepth.resize();
 });
 </script>
 </body>
