@@ -59,16 +59,16 @@
 
   <div class="kpi">
     <div class="kpi-label">Total Signups</div>
-    <div class="kpi-value">68</div>
-    <div class="kpi-sub">Subscribed on mdb.ai</div>
-    <div class="kpi-note">Tracking began Apr 6</div>
+    <div class="kpi-value">66</div>
+    <div class="kpi-sub">mdb.ai keys this week</div>
+    <div class="kpi-note">45 external · 21 internal/test</div>
   </div>
 
   <div class="kpi">
-    <div class="kpi-label">BYO-LLM (BYOK)</div>
-    <div class="kpi-value amber">~6%</div>
-    <div class="kpi-sub">vs 94% mdb.ai keys</div>
-    <div class="kpi-note">Low signal — tracking gap</div>
+    <div class="kpi-label">mdb.ai Key Users</div>
+    <div class="kpi-value green">45</div>
+    <div class="kpi-sub">External users (of 66 total)</div>
+    <div class="kpi-note">+150% WoW vs 18 prior week</div>
   </div>
 
   <div class="kpi green">
@@ -212,7 +212,7 @@
     <div id="c-funnel" class="chart"></div>
   </div>
   <div class="chart-box">
-    <h3>BYO-LLM vs mdb.ai Key Preference</h3>
+    <h3>mdb.ai Key Signups — External vs Internal</h3>
     <div id="c-byok" class="chart"></div>
   </div>
 </div>
@@ -266,8 +266,8 @@ cByok.setOption({
     type: 'pie', radius: ['38%', '65%'],
     label: { color: '#c9d1d9', fontSize: 12, formatter: '{b}\n{c}%' },
     data: [
-      { name: 'mdb.ai Key',  value: 94, itemStyle: { color: '#1f6feb' } },
-      { name: 'BYOK (own)', value: 6,  itemStyle: { color: '#3fb950' } }
+      { name: 'External users', value: 45, itemStyle: { color: '#1f6feb' } },
+      { name: 'Internal/test', value: 21, itemStyle: { color: '#6e7681' } }
     ]
   }]
 });
