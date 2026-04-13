@@ -1,0 +1,17 @@
+# llms.txt — https://llmstxt.org
+# This file helps LLMs understand and use this site.
+
+> Dashboards by Sidney Rabsatt, built with Anton (MindsDB). Data visualizations covering labor markets, economics, urban planning, and US history — all sourced from public datasets.
+
+## Dashboards
+
+- [AI Skills Gap Clock](https://rabsatt.github.io/anton-dashboards/dashboards/ai_skills_gap_clock.html): 342 occupations × 143M jobs scored for AI exposure using BLS data. Shows which skills are being automated and how fast.
+- [How Old Are My Neighbors?](https://rabsatt.github.io/anton-dashboards/dashboards/neighbors.html): Age and lifestyle by ZIP code across 31,433 US neighborhoods. Powered by Census ACS 2022 data. Click any dot on the map to explore a neighborhood.
+- [When to Leave a City](https://rabsatt.github.io/anton-dashboards/dashboards/when_to_leave_a_city.html): Rent trends, home price momentum, and real purchasing power by occupation and metro. Uses Zillow, Census ACS, and BLS data from 2015–2026.
+- [The Real Cost of a War](https://rabsatt.github.io/anton-dashboards/dashboards/real_cost_of_war.html): Six US conflicts measured in dollars, debt, and lives per objective achieved. Sources: FRED, Watson Institute, Congressional Research Service, DoD (1941–2023).
+- [Who Actually Controls Inflation?](https://rabsatt.github.io/anton-dashboards/dashboards/who_controls_inflation.html): Post-COVID inflation decomposed by category. Shows the role of used cars, shelter, and energy vs. government spending. Sources: FRED, BLS (2000–2026).
+
+## About
+
+Built with [Anton](https://github.com/mindsdb/mindsdb), an autonomous AI assistant by MindsDB.
+Source: https://github.com/rabsatt/anton-dashboards
